@@ -1,0 +1,27 @@
+# Dependencies
+node_modules
+
+# Build outputs
+.next
+dist
+build
+out
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+
+# Environment
+.env
+.env.local
+.env*.local
+
+# Documentation (optional - usuń tę linię jeśli chcesz formatować MD)
+*.md
+
+# Lock files
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
