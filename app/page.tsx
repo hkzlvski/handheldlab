@@ -1,21 +1,69 @@
 // app/page.tsx
-export default function Home() {
+import Link from 'next/link'
+import { createClient } from '@/lib/supabase/server'
+
+type Game = { id: string; name: string; slug: string }
+
+export default async function HomePage() {
+  const supabase = await createClient()
+
+  const { data: games } = await supabase
+    .from('games')
+    .select('id,name,slug')
+    .eq('status', 'approved')
+    .order('created_at', { ascending: false })
+    .limit(12)
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-24">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold text-gray-900">HandheldLab</h1>
-        <p className="mb-8 text-lg text-gray-600">
-          Performance database for handheld gaming PCs
+    <div className="space-y-10">
+      <section className="rounded-xl border border-gray-200 bg-white p-8">
+        <h1 className="text-3xl font-bold text-gray-900">
+          Find the perfect settings for your handheld
+        </h1>
+        <p className="mt-2 text-gray-600">
+          Browse real performance reports with settings + proof. No vibes. Just
+          data.
         </p>
-        <div className="rounded-lg bg-white p-8 shadow-md">
-          <p className="text-gray-700">
-            🚧 <strong>Phase 0 Complete</strong> - Project scaffolding ready
-          </p>
-          <p className="mt-4 text-sm text-gray-600">
-            Next: Phase A - Foundation (Database, Auth, Layout)
-          </p>
+        <div className="mt-5 flex gap-3">
+          <Link
+            className="rounded-md bg-primary-600 px-4 py-2 font-medium text-white shadow-sm hover:bg-primary-700"
+            href="/games"
+          >
+            Browse games
+          </Link>
+          <Link
+            className="rounded-md border border-gray-300 bg-white px-4 py-2 font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+            href="/submit"
+          >
+            Submit report
+          </Link>
         </div>
-      </div>
-    </main>
+      </section>
+
+      <section>
+        <div className="flex items-baseline justify-between">
+          <h2 className="text-xl font-semibold text-gray-900">Popular games</h2>
+          <Link
+            className="text-sm text-primary-600 hover:text-primary-700"
+            href="/games"
+          >
+            View all
+          </Link>
+        </div>
+
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+          {(games ?? []).map((g: Game) => (
+            <Link
+              key={g.id}
+              href={`/games/${g.slug}`}
+              className="rounded-lg border border-gray-200 bg-white p-4 hover:bg-gray-50"
+            >
+              <div className="font-medium text-gray-900">{g.name}</div>
+              <div className="mt-1 text-xs text-gray-500">/games/{g.slug}</div>
+            </Link>
+          ))}
+        </div>
+      </section>
+    </div>
   )
 }
