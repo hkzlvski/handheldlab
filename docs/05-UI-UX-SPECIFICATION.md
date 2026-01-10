@@ -1,7 +1,7 @@
 # HandheldLab - UI/UX Specification Document
 
-**Version:** 1.0  
-**Last Updated:** January 10, 2026  
+**Version:** 1.0
+**Last Updated:** January 10, 2026
 **Status:** Complete - LOCKED ✅
 
 ---
@@ -9,13 +9,32 @@
 ## Purpose
 
 This document defines the visual design system and component specifications for HandheldLab MVP to ensure:
-- Consistent UI across all pages
-- Accessible design from the start (WCAG AA)
-- Clear component patterns for implementation
-- Responsive layouts for mobile/tablet/desktop
 
-**Scope:** Design tokens, custom components, responsive breakpoints, accessibility  
+* Consistent UI across all pages
+* Accessible design from the start (WCAG AA)
+* Clear component patterns for implementation
+* Responsive layouts for mobile/tablet/desktop
+
+**Scope:** Design tokens, custom components, responsive breakpoints, accessibility
 **Non-Scope:** Pixel-perfect mockups, animation specs, every component variant
+
+---
+
+## Canon Alignment Note (LOCKED)
+
+**This UI/UX spec is aligned with 03-TECHNICAL-ARCHITECTURE.md and 06-IMPLEMENTATION-PLAN.md.**
+
+**Status fields (CANON):**
+
+* Reports use: `performance_reports.verification_status` = `pending | verified | rejected`
+* Games use: `games.status` = `pending | approved | rejected`
+
+**FPS Class thresholds (CANON):**
+
+* Excellent: **60+ FPS**
+* Good / Comfort: **40–59 FPS**
+* Fair / Playable: **30–39 FPS**
+* Poor: **<30 FPS**
 
 ---
 
@@ -35,6 +54,7 @@ This document defines the visual design system and component specifications for 
 ### 1.1 Color Palette
 
 **Primary (Brand):**
+
 ```javascript
 // Tailwind config
 colors: {
@@ -54,14 +74,16 @@ colors: {
 ```
 
 **Usage:**
-- Buttons (primary action): `bg-primary-600 hover:bg-primary-700`
-- Links: `text-primary-600 hover:text-primary-700`
-- Focus rings: `ring-primary-500`
-- Badges (verified): `bg-primary-100 text-primary-800`
+
+* Buttons (primary action): `bg-primary-600 hover:bg-primary-700`
+* Links: `text-primary-600 hover:text-primary-700`
+* Focus rings: `ring-primary-500`
+* Badges (verified): `bg-primary-100 text-primary-800`
 
 ---
 
 **Neutral (Grays):**
+
 ```javascript
 colors: {
   gray: {
@@ -80,11 +102,12 @@ colors: {
 ```
 
 **Usage:**
-- Body text: `text-gray-600`
-- Headings: `text-gray-900`
-- Borders: `border-gray-200`
-- Card backgrounds: `bg-gray-50` or `bg-white`
-- Disabled: `text-gray-400 bg-gray-100`
+
+* Body text: `text-gray-600`
+* Headings: `text-gray-900`
+* Borders: `border-gray-200`
+* Card backgrounds: `bg-gray-50` or `bg-white`
+* Disabled: `text-gray-400 bg-gray-100`
 
 ---
 
@@ -127,34 +150,37 @@ colors: {
 }
 ```
 
-
 **Usage:**
-- Success badges (verified): `bg-success-100 text-success-800`
-- Warning badges (pending): `bg-warning-100 text-warning-800`
-- Error badges (rejected): `bg-error-100 text-error-800`
-- Form errors: `text-error-600 border-error-500`
+
+* Success badges (verified): `bg-success-100 text-success-800`
+* Warning badges (pending): `bg-warning-100 text-warning-800`
+* Error badges (rejected): `bg-error-100 text-error-800`
+* Form errors: `text-error-600 border-error-500`
 
 ---
 
-**FPS Class Colors (Custom):**
+**FPS Class Colors (Custom) — CANON:**
+
 ```javascript
 colors: {
   'fps-excellent': '#22c55e',  // 60+ FPS (green)
-  'fps-good': '#3b82f6',       // 45-59 FPS (blue)
-  'fps-fair': '#f59e0b',       // 30-44 FPS (amber)
+  'fps-good': '#3b82f6',       // 40-59 FPS (blue)
+  'fps-fair': '#f59e0b',       // 30-39 FPS (amber)
   'fps-poor': '#ef4444',       // <30 FPS (red)
 }
 ```
 
 **Usage:**
-- FPS badges on report cards
-- Color-coded metrics
+
+* FPS badges on report cards
+* Color-coded metrics
 
 ---
 
 ### 1.2 Typography
 
 **Font Families:**
+
 ```javascript
 fontFamily: {
   sans: ['Inter', 'system-ui', 'sans-serif'],
@@ -163,6 +189,7 @@ fontFamily: {
 ```
 
 **Font Sizes:**
+
 ```javascript
 fontSize: {
   xs: ['0.75rem', { lineHeight: '1rem' }],      // 12px - Small labels
@@ -177,6 +204,7 @@ fontSize: {
 ```
 
 **Font Weights:**
+
 ```javascript
 fontWeight: {
   normal: '400',    // Body text
@@ -187,18 +215,20 @@ fontWeight: {
 ```
 
 **Usage:**
-- Page titles: `text-3xl font-bold text-gray-900`
-- Section headings: `text-2xl font-semibold text-gray-900`
-- Card titles: `text-lg font-semibold text-gray-800`
-- Body text: `text-base text-gray-600`
-- Small labels: `text-xs font-medium text-gray-500`
-- FPS numbers: `font-mono text-xl font-bold`
+
+* Page titles: `text-3xl font-bold text-gray-900`
+* Section headings: `text-2xl font-semibold text-gray-900`
+* Card titles: `text-lg font-semibold text-gray-800`
+* Body text: `text-base text-gray-600`
+* Small labels: `text-xs font-medium text-gray-500`
+* FPS numbers: `font-mono text-xl font-bold`
 
 ---
 
 ### 1.3 Spacing Scale
 
 **Tailwind default scale (4px base):**
+
 ```javascript
 spacing: {
   0: '0px',
@@ -218,15 +248,17 @@ spacing: {
 ```
 
 **Common Usage:**
-- Component padding: `p-4` (16px) or `p-6` (24px)
-- Card gap: `gap-6` (24px)
-- Section margin: `mb-8` (32px) or `mb-12` (48px)
-- Button padding: `px-4 py-2` (16px horizontal, 8px vertical)
-- Grid gap: `gap-4` (16px) mobile, `gap-6` (24px) desktop
+
+* Component padding: `p-4` (16px) or `p-6` (24px)
+* Card gap: `gap-6` (24px)
+* Section margin: `mb-8` (32px) or `mb-12` (48px)
+* Button padding: `px-4 py-2` (16px horizontal, 8px vertical)
+* Grid gap: `gap-4` (16px) mobile, `gap-6` (24px) desktop
 
 ---
 
 ### 1.4 Border Radius
+
 ```javascript
 borderRadius: {
   none: '0px',
@@ -241,15 +273,17 @@ borderRadius: {
 ```
 
 **Usage:**
-- Buttons: `rounded-md` (6px)
-- Cards: `rounded-lg` (8px)
-- Inputs: `rounded` (4px)
-- Badges: `rounded-sm` (2px)
-- Avatar placeholders: `rounded-full`
+
+* Buttons: `rounded-md` (6px)
+* Cards: `rounded-lg` (8px)
+* Inputs: `rounded` (4px)
+* Badges: `rounded-sm` (2px)
+* Avatar placeholders: `rounded-full`
 
 ---
 
 ### 1.5 Shadows
+
 ```javascript
 boxShadow: {
   sm: '0 1px 2px 0 rgb(0 0 0 / 0.05)',        // Subtle hover
@@ -262,10 +296,11 @@ boxShadow: {
 ```
 
 **Usage:**
-- Cards (default): `shadow`
-- Cards (hover): `hover:shadow-md transition-shadow`
-- Modals: `shadow-lg`
-- Dropdowns: `shadow-xl`
+
+* Cards (default): `shadow`
+* Cards (hover): `hover:shadow-md transition-shadow`
+* Modals: `shadow-lg`
+* Dropdowns: `shadow-xl`
 
 ---
 
@@ -276,6 +311,7 @@ boxShadow: {
 **Purpose:** Display performance report in grid/list views
 
 **Anatomy:**
+
 ```
 ┌─────────────────────────────────────┐
 │  📷 Screenshot (16:9 aspect)        │
@@ -292,13 +328,14 @@ boxShadow: {
 ```
 
 **Structure:**
+
 ```tsx
 <div className="bg-white rounded-lg shadow hover:shadow-md transition-shadow overflow-hidden">
   {/* Screenshot */}
   <div className="relative aspect-video bg-gray-100">
     <Image 
       src={signedUrl} 
-      alt="Performance screenshot"
+      alt={`Performance screenshot showing ${fpsAverage} FPS on ${deviceName}`}
       fill
       className="object-cover"
     />
@@ -342,13 +379,15 @@ boxShadow: {
 ```
 
 **States:**
-- Default: `shadow`
-- Hover: `hover:shadow-md` (interactive elevation)
-- Loading: Skeleton placeholder (gray rectangles)
+
+* Default: `shadow`
+* Hover: `hover:shadow-md` (interactive elevation)
+* Loading: Skeleton placeholder (gray rectangles)
 
 **Responsive:**
-- Mobile (<768px): Full width, single column
-- Desktop (≥768px): Grid (2-3 columns)
+
+* Mobile (<768px): Full width, single column
+* Desktop (≥768px): Grid (2-3 columns)
 
 ---
 
@@ -357,6 +396,7 @@ boxShadow: {
 **Purpose:** Toggle upvote on reports
 
 **Anatomy:**
+
 ```
 ┌──────────────┐
 │  ❤️ 24       │  (filled heart, upvoted)
@@ -368,6 +408,7 @@ boxShadow: {
 ```
 
 **Structure:**
+
 ```tsx
 <button
   onClick={handleToggle}
@@ -384,14 +425,16 @@ boxShadow: {
 ```
 
 **States:**
-- Not upvoted: Outline heart, gray
-- Upvoted: Filled heart, red (`text-error-500 fill-current`)
-- Hover: `hover:bg-gray-100`
-- Disabled (anon): `cursor-not-allowed opacity-50`
+
+* Not upvoted: Outline heart, gray
+* Upvoted: Filled heart, red (`text-error-500 fill-current`)
+* Hover: `hover:bg-gray-100`
+* Disabled (anon): `cursor-not-allowed opacity-50`
 
 **Interaction:**
-- Anonymous: Click → Login modal
-- Authenticated: Click → Toggle vote (optimistic UI)
+
+* Anonymous: Click → Login modal
+* Authenticated: Click → Toggle vote (optimistic UI)
 
 ---
 
@@ -399,7 +442,10 @@ boxShadow: {
 
 **Purpose:** Show report verification status
 
+**CANON mapping:** `status` in this component = `performance_reports.verification_status`
+
 **Variants:**
+
 ```tsx
 // Pending
 <span className="inline-flex items-center gap-1 px-2 py-1 bg-warning-100 text-warning-800 text-xs font-medium rounded-sm">
@@ -421,9 +467,10 @@ boxShadow: {
 ```
 
 **Usage:**
-- Profile page: All statuses visible
-- Game page: Only "Verified" shown (implicit)
-- Admin queue: "Pending" only
+
+* Profile page: All statuses visible
+* Game page: Only "Verified" shown (implicit)
+* Admin queue: "Pending" only
 
 ---
 
@@ -432,20 +479,21 @@ boxShadow: {
 **Purpose:** Color-coded FPS performance indicator
 
 **Variants:**
+
 ```tsx
 // Excellent (60+ FPS)
 <span className="px-2 py-1 bg-fps-excellent text-white text-xs font-mono font-bold rounded-sm">
   60+ FPS
 </span>
 
-// Good (45-59 FPS)
+// Good / Comfort (40-59 FPS)
 <span className="px-2 py-1 bg-fps-good text-white text-xs font-mono font-bold rounded-sm">
-  45-59 FPS
+  40-59 FPS
 </span>
 
-// Fair (30-44 FPS)
+// Fair / Playable (30-39 FPS)
 <span className="px-2 py-1 bg-fps-fair text-white text-xs font-mono font-bold rounded-sm">
-  30-44 FPS
+  30-39 FPS
 </span>
 
 // Poor (<30 FPS)
@@ -455,10 +503,11 @@ boxShadow: {
 ```
 
 **Logic:**
+
 ```typescript
 function getFPSClass(fps: number): string {
   if (fps >= 60) return 'fps-excellent'
-  if (fps >= 45) return 'fps-good'
+  if (fps >= 40) return 'fps-good'
   if (fps >= 30) return 'fps-fair'
   return 'fps-poor'
 }
@@ -469,6 +518,7 @@ function getFPSClass(fps: number): string {
 ### 2.5 Button (Standard Variants)
 
 **Primary Button:**
+
 ```tsx
 <button className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-md shadow-sm hover:shadow transition-all disabled:opacity-50 disabled:cursor-not-allowed">
   Submit Report
@@ -476,6 +526,7 @@ function getFPSClass(fps: number): string {
 ```
 
 **Secondary Button:**
+
 ```tsx
 <button className="px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 font-medium rounded-md border border-gray-300 shadow-sm hover:shadow transition-all">
   Cancel
@@ -483,6 +534,7 @@ function getFPSClass(fps: number): string {
 ```
 
 **Danger Button (Admin):**
+
 ```tsx
 <button className="px-4 py-2 bg-error-600 hover:bg-error-700 text-white font-medium rounded-md shadow-sm hover:shadow transition-all">
   Reject Report
@@ -490,6 +542,7 @@ function getFPSClass(fps: number): string {
 ```
 
 **Ghost Button (tertiary):**
+
 ```tsx
 <button className="px-4 py-2 text-gray-700 hover:bg-gray-100 font-medium rounded-md transition-colors">
   Learn More
@@ -497,17 +550,19 @@ function getFPSClass(fps: number): string {
 ```
 
 **States:**
-- Default: Base styles
-- Hover: Darker background + elevated shadow
-- Active: `active:scale-[0.98]` (subtle press effect)
-- Disabled: `opacity-50 cursor-not-allowed`
-- Focus: `focus:ring-2 focus:ring-primary-500 focus:ring-offset-2`
+
+* Default: Base styles
+* Hover: Darker background + elevated shadow
+* Active: `active:scale-[0.98]` (subtle press effect)
+* Disabled: `opacity-50 cursor-not-allowed`
+* Focus: `focus:ring-2 focus:ring-primary-500 focus:ring-offset-2`
 
 ---
 
 ### 2.6 Form Inputs
 
 **Text Input:**
+
 ```tsx
 <input
   type="text"
@@ -517,6 +572,7 @@ function getFPSClass(fps: number): string {
 ```
 
 **Error State:**
+
 ```tsx
 <input
   type="text"
@@ -530,6 +586,7 @@ function getFPSClass(fps: number): string {
 ```
 
 **Select Dropdown (Radix):**
+
 ```tsx
 <Select.Root>
   <Select.Trigger className="w-full px-3 py-2 bg-white border border-gray-300 rounded focus:ring-2 focus:ring-primary-500">
@@ -548,6 +605,7 @@ function getFPSClass(fps: number): string {
 ### 2.7 Modal (Radix Dialog)
 
 **Structure:**
+
 ```tsx
 <Dialog.Root>
   <Dialog.Trigger asChild>
@@ -580,9 +638,10 @@ function getFPSClass(fps: number): string {
 ```
 
 **Usage:**
-- Login/Signup modals
-- Screenshot full-view modal
-- Admin rejection reason modal
+
+* Login/Signup modals
+* Screenshot full-view modal
+* Admin rejection reason modal
 
 ---
 
@@ -591,6 +650,7 @@ function getFPSClass(fps: number): string {
 ### 3.1 Page Container
 
 **Standard page wrapper:**
+
 ```tsx
 <div className="min-h-screen bg-gray-50">
   {/* Header */}
@@ -614,7 +674,7 @@ function getFPSClass(fps: number): string {
 </div>
 ```
 
-**Max Width:** `max-w-7xl` (1280px)  
+**Max Width:** `max-w-7xl` (1280px)
 **Padding:** `px-4` mobile, `px-6` tablet, `px-8` desktop
 
 ---
@@ -622,6 +682,7 @@ function getFPSClass(fps: number): string {
 ### 3.2 Grid Layout (Reports)
 
 **Mobile:**
+
 ```tsx
 <div className="grid grid-cols-1 gap-4">
   {/* Single column */}
@@ -629,6 +690,7 @@ function getFPSClass(fps: number): string {
 ```
 
 **Tablet:**
+
 ```tsx
 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
   {/* 2 columns */}
@@ -636,6 +698,7 @@ function getFPSClass(fps: number): string {
 ```
 
 **Desktop:**
+
 ```tsx
 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
   {/* 3 columns */}
@@ -645,6 +708,7 @@ function getFPSClass(fps: number): string {
 ---
 
 ### 3.3 Header (Sticky)
+
 ```tsx
 <header className="sticky top-0 z-30 bg-white border-b border-gray-200 shadow-sm">
   <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
@@ -678,6 +742,7 @@ function getFPSClass(fps: number): string {
 ## 4. Responsive Breakpoints
 
 ### 4.1 Tailwind Breakpoints
+
 ```javascript
 screens: {
   sm: '640px',   // Tablet portrait
@@ -689,15 +754,17 @@ screens: {
 ```
 
 **Usage:**
-- Mobile-first approach (base styles = mobile)
-- Use `sm:`, `md:`, `lg:` prefixes for larger screens
-- Example: `grid-cols-1 md:grid-cols-2 lg:grid-cols-3`
+
+* Mobile-first approach (base styles = mobile)
+* Use `sm:`, `md:`, `lg:` prefixes for larger screens
+* Example: `grid-cols-1 md:grid-cols-2 lg:grid-cols-3`
 
 ---
 
 ### 4.2 Common Responsive Patterns
 
 **Typography:**
+
 ```tsx
 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">
   Page Title
@@ -705,6 +772,7 @@ screens: {
 ```
 
 **Spacing:**
+
 ```tsx
 <div className="p-4 md:p-6 lg:p-8">
   {/* Adaptive padding */}
@@ -712,6 +780,7 @@ screens: {
 ```
 
 **Grid Columns:**
+
 ```tsx
 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
   {/* Adaptive grid */}
@@ -719,6 +788,7 @@ screens: {
 ```
 
 **Hide/Show Elements:**
+
 ```tsx
 {/* Show on mobile only */}
 <div className="block md:hidden">Mobile Menu</div>
@@ -732,20 +802,24 @@ screens: {
 ### 4.3 Mobile Considerations
 
 **Touch Targets:**
-- Minimum 44x44px (Tailwind: `min-h-11 min-w-11`)
-- Buttons: `py-3` instead of `py-2` on mobile
+
+* Minimum 44x44px (Tailwind: `min-h-11 min-w-11`)
+* Buttons: `py-3` instead of `py-2` on mobile
 
 **Navigation:**
-- Mobile: Hamburger menu (Radix DropdownMenu)
-- Desktop: Horizontal nav
+
+* Mobile: Hamburger menu (Radix DropdownMenu)
+* Desktop: Horizontal nav
 
 **Forms:**
-- Mobile: Full-width inputs (`w-full`)
-- Desktop: Constrained width (`max-w-md`)
+
+* Mobile: Full-width inputs (`w-full`)
+* Desktop: Constrained width (`max-w-md`)
 
 **Modals:**
-- Mobile: Full screen or bottom sheet
-- Desktop: Centered overlay (`max-w-md`)
+
+* Mobile: Full screen or bottom sheet
+* Desktop: Centered overlay (`max-w-md`)
 
 ---
 
@@ -754,25 +828,37 @@ screens: {
 ### 5.1 Color Contrast (WCAG AA)
 
 **Text Contrast Ratios:**
-- Normal text (16px+): 4.5:1 minimum
-- Large text (24px+ or 18px+ bold): 3:1 minimum
-- UI components (buttons, inputs): 3:1 minimum
+
+* Normal text (16px+): 4.5:1 minimum
+* Large text (24px+ or 18px+ bold): 3:1 minimum
+* UI components (buttons, inputs): 3:1 minimum
 
 **Check:**
-- `text-gray-900` on `bg-white`: ✅ Pass (21:1)
-- `text-gray-600` on `bg-white`: ✅ Pass (7:1)
-- `text-gray-400` on `bg-white`: ⚠️ Fail (use for disabled only)
-- `text-white` on `bg-primary-600`: ✅ Pass (4.9:1)
+
+* `text-gray-900` on `bg-white`: ✅ Pass (21:1)
+* `text-gray-600` on `bg-white`: ✅ Pass (7:1)
+* `text-gray-400` on `bg-white`: ⚠️ Fail (use for disabled only)
+* `text-white` on `bg-primary-600`: ✅ Pass (4.9:1)
+
+**Rule (LOCKED):**
+
+* `text-gray-400` is allowed ONLY for:
+
+  * disabled states
+  * placeholder text
+    Never use it for critical info (status, FPS, key metrics).
 
 **Tools:**
-- WebAIM Contrast Checker
-- Browser DevTools Accessibility panel
+
+* WebAIM Contrast Checker
+* Browser DevTools Accessibility panel
 
 ---
 
 ### 5.2 Keyboard Navigation
 
 **Focus States:**
+
 ```tsx
 // All interactive elements MUST have visible focus
 <button className="... focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
@@ -785,21 +871,24 @@ screens: {
 ```
 
 **Tab Order:**
-- Logical flow (top to bottom, left to right)
-- Skip links for navigation (optional v2)
-- Modal traps focus (Radix handles this)
+
+* Logical flow (top to bottom, left to right)
+* Skip links for navigation (optional v2)
+* Modal traps focus (Radix handles this)
 
 **Keyboard Shortcuts:**
-- Enter/Space: Activate buttons/links
-- Escape: Close modals
-- Tab/Shift+Tab: Navigate
-- Arrow keys: Navigate dropdown menus (Radix handles this)
+
+* Enter/Space: Activate buttons/links
+* Escape: Close modals
+* Tab/Shift+Tab: Navigate
+* Arrow keys: Navigate dropdown menus (Radix handles this)
 
 ---
 
 ### 5.3 Screen Reader Support
 
 **Semantic HTML:**
+
 ```tsx
 <header>
   <nav aria-label="Main navigation">
@@ -818,6 +907,7 @@ screens: {
 ```
 
 **ARIA Labels:**
+
 ```tsx
 // Icon-only buttons
 <button aria-label="Close modal">
@@ -841,6 +931,7 @@ screens: {
 ```
 
 **Image Alt Text:**
+
 ```tsx
 <Image 
   src={screenshot} 
@@ -853,6 +944,7 @@ screens: {
 ### 5.4 Form Accessibility
 
 **Labels:**
+
 ```tsx
 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
   Email Address
@@ -868,6 +960,7 @@ screens: {
 ```
 
 **Error Messages:**
+
 ```tsx
 <input 
   id="username" 
@@ -882,6 +975,7 @@ screens: {
 ```
 
 **Required Fields:**
+
 ```tsx
 <label>
   Username <span className="text-error-600" aria-label="required">*</span>
@@ -894,22 +988,24 @@ screens: {
 ### 5.5 Accessibility Checklist
 
 **Before Launch:**
-- [ ] All interactive elements have visible focus states
-- [ ] Color contrast meets WCAG AA (4.5:1 for text)
-- [ ] All images have descriptive alt text
-- [ ] Form inputs have associated labels
-- [ ] Error messages are announced to screen readers
-- [ ] Keyboard navigation works for all interactive elements
-- [ ] Modal focus trapping works (Radix handles this)
-- [ ] Semantic HTML used (`<header>`, `<main>`, `<nav>`, `<footer>`)
-- [ ] ARIA labels for icon-only buttons
-- [ ] Page titles are descriptive (`<title>Game Name - HandheldLab</title>`)
+
+* [ ] All interactive elements have visible focus states
+* [ ] Color contrast meets WCAG AA (4.5:1 for text)
+* [ ] All images have descriptive alt text
+* [ ] Form inputs have associated labels
+* [ ] Error messages are announced to screen readers
+* [ ] Keyboard navigation works for all interactive elements
+* [ ] Modal focus trapping works (Radix handles this)
+* [ ] Semantic HTML used (`<header>`, `<main>`, `<nav>`, `<footer>`)
+* [ ] ARIA labels for icon-only buttons
+* [ ] Page titles are descriptive (`<title>Game Name - HandheldLab</title>`)
 
 **Testing:**
-- [ ] Test with keyboard only (no mouse)
-- [ ] Test with screen reader (VoiceOver/NVDA)
-- [ ] Run Lighthouse accessibility audit (score >90)
-- [ ] Run axe DevTools (0 violations)
+
+* [ ] Test with keyboard only (no mouse)
+* [ ] Test with screen reader (VoiceOver/NVDA)
+* [ ] Run Lighthouse accessibility audit (score >90)
+* [ ] Run axe DevTools (0 violations)
 
 ---
 
@@ -918,12 +1014,14 @@ screens: {
 ### 6.1 Tailwind Configuration
 
 **Install:**
+
 ```bash
 npm install -D tailwindcss postcss autoprefixer
 npx tailwindcss init -p
 ```
 
 **tailwind.config.js:**
+
 ```javascript
 module.exports = {
   content: [
@@ -953,6 +1051,7 @@ module.exports = {
 ### 6.2 CSS Variables (Optional Alternative)
 
 **If you prefer CSS variables over Tailwind config:**
+
 ```css
 /* globals.css */
 :root {
@@ -966,6 +1065,7 @@ module.exports = {
 ```
 
 **Usage:**
+
 ```tsx
 <div style={{ backgroundColor: 'var(--color-primary-600)' }}>
   {/* Content */}
@@ -979,16 +1079,19 @@ module.exports = {
 ### 6.3 Component Library Setup
 
 **Radix UI Installation:**
+
 ```bash
 npm install @radix-ui/react-dialog @radix-ui/react-dropdown-menu @radix-ui/react-select
 ```
 
 **Lucide Icons:**
+
 ```bash
 npm install lucide-react
 ```
 
 **Usage:**
+
 ```tsx
 import { Heart, Check, X, Clock, ChevronDown } from 'lucide-react'
 
@@ -1000,6 +1103,7 @@ import { Heart, Check, X, Clock, ChevronDown } from 'lucide-react'
 ### 6.4 Responsive Image Handling
 
 **Next.js Image Component:**
+
 ```tsx
 import Image from 'next/image'
 
@@ -1016,6 +1120,7 @@ import Image from 'next/image'
 ```
 
 **Aspect Ratio Container:**
+
 ```tsx
 <div className="relative aspect-video w-full bg-gray-100 rounded-lg overflow-hidden">
   <Image 
@@ -1027,11 +1132,18 @@ import Image from 'next/image'
 </div>
 ```
 
+**LOCKED implementation note (CANON):**
+
+* Screenshots are stored in a private Supabase bucket.
+* UI must use **signed URLs** only.
+* Signed URLs must be generated **server-side** (service role), not in the browser client.
+
 ---
 
 ### 6.5 Dark Mode (Future Consideration)
 
 **Not in MVP, but prepared for v2:**
+
 ```javascript
 // tailwind.config.js
 module.exports = {
@@ -1047,6 +1159,7 @@ module.exports = {
 ```
 
 **Usage:**
+
 ```tsx
 <div className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
   {/* Content adapts to dark mode */}
@@ -1060,14 +1173,18 @@ module.exports = {
 **Status:** 05-UI-UX-SPECIFICATION.md COMPLETE ✅
 
 **Next Steps:**
-- Proceed to `06-IMPLEMENTATION-PLAN.md` for phase-by-phase development tasks
-- Copy design tokens to Tailwind config during implementation
-- Build component library incrementally (start with buttons, inputs, cards)
+
+* Proceed to `06-IMPLEMENTATION-PLAN.md` for phase-by-phase development tasks
+* Copy design tokens to Tailwind config during implementation
+* Build component library incrementally (start with buttons, inputs, cards)
 
 **Implementation Priority:**
+
 1. Set up Tailwind config with design tokens
 2. Build layout components (Header, Footer, Container)
 3. Build form components (Input, Select, Button)
 4. Build custom components (ReportCard, UpvoteButton, StatusBadge)
 5. Implement responsive patterns
 6. Test accessibility (keyboard, screen reader, contrast)
+
+---

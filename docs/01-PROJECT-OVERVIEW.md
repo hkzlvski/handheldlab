@@ -8,284 +8,283 @@
 
 ## 1. Executive Summary
 
-**HandheldLab odpowiada na jedno pytanie zakupowe:**  
-*"Jak ta gra faktycznie działa na konkretnym handheldzie — i jakie kompromisy muszę zaakceptować?"*
+**HandheldLab answers one purchase question:**  
+*"How does this game actually run on a specific handheld — and what tradeoffs will I have to accept?"*
 
-Platforma pokazuje zweryfikowane, real-world raporty wydajności: FPS, zużycie baterii (TDP), ustawienia graficzne i wersję Proton — poparte screenshotami z overlay.
+The platform shows verified, real-world performance reports: FPS, battery draw (TDP), graphics settings, and Proton version — backed by screenshots with an FPS overlay.
 
-**Nie mówimy czy gra działa.**  
-Pokazujemy *jak dobrze* działa, *jak długo*, i *kosztem czego*.
+**We don’t say whether a game runs.**  
+We show *how well* it runs, *for how long*, and *at what cost*.
 
-**HandheldLab = realne testy w warunkach handheldowych, a nie opinie.**
+**HandheldLab = real handheld conditions testing, not opinions.**
 
 ---
 
 ## 2. Problem Statement
 
-### 2.1 Główny Problem (The Core Pain)
+### 2.1 The Core Pain
 
 **Buying a game for a handheld PC is a gamble.**
 
-Użytkownik chce kupić grę za 60€, ale nie wie:
-- Czy osiągnie 30 FPS? 60 FPS?
-- Ile baterii to zje? (2h? 4h?)
-- Jakie ustawienia graficzne da się ustawić?
-- Czy musi obniżyć rozdzielczość?
-- Jaki TDP ustawić żeby było grywalnie?
-- Czy Proton zadziała stabilnie?
+A user wants to buy a €60 game, but doesn’t know:
+- Will it hit 30 FPS? 60 FPS?
+- How much battery will it eat? (2h? 4h?)
+- What graphics settings are realistically usable?
+- Do they need to drop resolution?
+- What TDP is the “playable” sweet spot?
+- Will Proton run it stably?
 
-**Nawet jeśli gra "działa", może być głośna, żreć baterię w 90 minut albo wymagać kompromisów, które zabijają przyjemność grania na handheldzie.**
+**Even if a game “runs,” it can be loud, kill the battery in 90 minutes, or require tradeoffs that ruin handheld comfort.**
 
-**Obecne "rozwiązania" zawodzą:**
+**Existing “solutions” fail:**
 
 #### YouTube benchmarks:
-- ❌ Pokazują ustawienia które tester wybrał, nie optymalne
-- ❌ Różne wersje Proton/sterowniki = inne wyniki
-- ❌ Brak porównywalności (każdy ma inne overlay)
-- ❌ Clickbait thumbnails ("60 FPS!" ale przez 5 minut)
+- ❌ Show the tester’s chosen settings, not the optimal ones
+- ❌ Different Proton/driver versions = different results
+- ❌ Poor comparability (everyone uses a different overlay/setup)
+- ❌ Clickbait thumbnails (“60 FPS!” for five minutes)
 
 #### ProtonDB:
-- ✅ Mówi "czy działa"
-- ❌ NIE mówi "jak dobrze działa"
-- ❌ Brak danych o FPS/baterii/TDP
-- ❌ Komentarze to opinie, nie dane
+- ✅ Says “does it run”
+- ❌ Does NOT say “how well does it run”
+- ❌ No FPS/battery/TDP data
+- ❌ Comments are opinions, not standardized data
 
 #### Steam Deck Verified:
-- ✅ Valve weryfikuje czy gra odpala
-- ❌ "Playable" może znaczyć 25 FPS
-- ❌ Zero informacji o innych handheldach (ROG Ally, Legion Go)
-- ❌ Brak danych o ustawieniach
+- ✅ Valve verifies whether the game boots and is usable
+- ❌ “Playable” can still mean 25 FPS
+- ❌ No coverage for other handhelds (ROG Ally, Legion Go)
+- ❌ No real settings data
 
 #### Reddit/Discord:
-- ❌ Fragmentaryczne info rozproszone po wątkach
-- ❌ "U mnie działa" bez screenshota = nieweryfikowalne
-- ❌ Nie da się wyszukać po device + game
-- ❌ Stare posty dezaktualizują się (nowe Proton/patche)
+- ❌ Fragmented info scattered across threads
+- ❌ “Works for me” without proof = unverifiable
+- ❌ Not searchable by device + game in a consistent way
+- ❌ Old posts become outdated (new Proton/patches)
 
 ---
 
-### 2.2 Kto Cierpi? (User Segments)
+### 2.2 Who Suffers? (User Segments)
 
-#### Persona A: "The Buyer" (70% traffic)
+#### Persona A: “The Buyer” (70% traffic)
 
-**Kim jest:**
-- Posiada Steam Deck / ROG Ally / Legion Go
-- Casual-moderate gamer
-- Budżet 20-60€/gra
-- Ograniczone umiejętności techniczne
+**Who they are:**
+- Owns a Steam Deck / ROG Ally / Legion Go
+- Casual-to-moderate gamer
+- €20–€60 per game budget
+- Limited technical skills
 
-**Jego problem:**
-- Chce kupić Elden Ring, ale nie wie czy Steam Deck da radę w 40+ FPS
-- YouTube pokazuje 45 FPS, ale jakim TDP? Jaką baterią?
-- ProtonDB mówi "Gold" ale to nic nie znaczy
-- Nie chce kupić gry i się rozczarować
-- **Nie chce spędzić godziny na YouTube ani w ustawieniach — chce szybkiej, wiarygodnej odpowiedzi przed kliknięciem "Kup".**
+**Their problem:**
+- Wants to buy Elden Ring but doesn’t know if Steam Deck can do 40+ FPS
+- YouTube shows “45 FPS” but… what TDP? what battery life?
+- ProtonDB says “Gold,” which doesn’t answer the real question
+- Doesn’t want to buy and regret it
+- **Doesn’t want to spend an hour on YouTube or tweaking — wants a fast, trustworthy answer before clicking “Buy.”**
 
 **Job To Be Done:**
-> "Przed zakupem chcę wiedzieć czy ta gra będzie PRZYJEMNA do grania na moim urządzeniu — nie tylko czy odpali."
+> “Before I buy, I want to know if this game will feel GOOD on my device — not just whether it launches.”
 
 ---
 
-#### Persona B: "The Optimizer" (20% traffic)
+#### Persona B: “The Optimizer” (20% traffic)
 
-**Kim jest:**
-- Enthusiast/power user
-- Tweak'uje TDP/resolution/Proton
-- Aktywny na r/SteamDeck, Discord
-- Lubi pomagać community
+**Who they are:**
+- Enthusiast / power user
+- Tweaks TDP/resolution/Proton
+- Active on r/SteamDeck and Discord
+- Enjoys helping the community
 
-**Jego problem:**
-- Spędził 2h optymalizując Cyberpunk na ROG Ally
-- Znalazł sweet spot: Medium, 20W TDP, FSR Quality = 60 FPS stabilne
-- Chce się podzielić, ale:
-  - Reddit post zginie w archiwum
-  - Discord wiadomość przepadnie
-  - Nikt nie da mu credit za pomoc
-- **Chce, żeby jego konfiguracje były odnajdywalne, aktualne i przypisane do niego jako autora.**
+**Their problem:**
+- Spent 2 hours optimizing Cyberpunk on a ROG Ally
+- Found a sweet spot: Medium, 20W TDP, FSR Quality = stable 60 FPS
+- Wants to share it, but:
+  - A Reddit post gets buried
+  - A Discord message disappears
+  - They don’t get lasting credit for helping
+- **Wants their configurations to be searchable, durable, and attributed to them as the author — as long as their account exists. If they delete their account, reports remain but attribution becomes `@[deleted]` (locked product rule).**
 
 **Job To Be Done:**
-> "Chcę dzielić się swoimi optymalizacjami i dostać uznanie jako trusted source."
+> “I want to share my optimizations and be recognized as a trusted source.”
 
 ---
 
-#### Persona C: "The Quality Gate"
+#### Persona C: “The Quality Gate”
 
-**Kim jest:**
-- Owner projektu
-- Domain expert (zna handhelde)
+**Who they are:**
+- Project owner
+- Domain expert (knows handhelds)
 - Quality gatekeeper
 
-**Jego problem:**
-- Musi zapewnić że dane są wiarygodne
-- Fake screeny / troll reports niszczą wartość
-- Za dużo spam = użytkownicy tracą zaufanie
+**Their problem:**
+- Must ensure the data is trustworthy
+- Fake screenshots / troll reports destroy value
+- Too much spam = users lose trust
 
 **Job To Be Done:**
-> "Chcę utrzymać jakość danych przy minimalnym wysiłku moderacji."
+> “I want to maintain data quality with minimal moderation effort.”
 
 ---
 
-## 3. Solution (Jak HandheldLab Rozwiązuje Problem)
+## 3. Solution (How HandheldLab Solves the Problem)
 
 ### 3.1 Core Solution Mechanism
 
-**HandheldLab = Verified Performance Database**
+**HandheldLab = a Verified Performance Database**
 
-**Trzy filary:**
+**Three pillars:**
 
 **1. Evidence-Based (Screenshot Required)**
-- Każdy raport MUSI mieć screenshot z FPS overlay (Mangohud/MSI Afterburner)
-- Bez screenshota = nie ma raportu
-- **Automatyczne walidacje (zakres FPS/TDP, overlay detection, metadata) odsiewają większość błędów — admin ręcznie sprawdza tylko raporty oznaczone jako podejrzane lub wysoko oceniane.**
+- Every report MUST include a screenshot with an FPS overlay (MangoHud / MSI Afterburner)
+- No screenshot = no report
+- **Automatic validations (FPS/TDP ranges, anomaly checks, metadata stripping) catch most issues — admin manually reviews only suspicious or high-impact reports.**
 
 **2. Device-Specific Data**
-- Reports podzielone po konkretnych urządzeniach (Steam Deck OLED ≠ Steam Deck LCD)
-- Filtry: device, FPS range, TDP
+- Reports are tied to specific devices (Steam Deck OLED ≠ Steam Deck LCD)
+- Filters: device, FPS range, TDP
 - Sorting: most helpful, newest, highest FPS, lowest TDP
-- **Każdy raport jest timestampowany i powiązany z konkretną wersją gry i środowiska, dzięki czemu stare konfiguracje nie udają aktualnych.**
+- **Each report is timestamped and linked to a specific environment (settings + Proton version), so old configs don’t pretend to be current.**
 
 **3. Tradeoff Transparency**
-- Każdy raport pokazuje: FPS + TDP + resolution + graphics preset + Proton
-- User widzi KOMPROMISY: "60 FPS ale 25W TDP = 1.5h baterii" vs "40 FPS ale 15W = 3h"
-- FPS Class badge: "60+ Smooth", "40+ Comfort", "30+ Playable"
+- Every report shows: FPS + TDP + resolution + graphics preset + Proton
+- Users see the TRADEOFFS: “60 FPS at 25W = ~1.5h battery” vs “40 FPS at 15W = ~3h”
+- FPS Class badges: “60+ Smooth”, “40+ Comfort”, “30+ Playable”
 
 ---
 
-### 3.2 Jak To Rozwiązuje Każdy Ból?
+### 3.2 How This Solves Each Pain
 
-#### ❌ Problem: "YouTube benchmarks są nieporównywalne"
-#### ✅ Solution: 
-- Standaryzowane formularze (TDP dropdown: 5W-30W, resolution dropdown, preset dropdown)
-- Wszyscy raportują te same metryki
-- Sortowanie po upvotes = najlepsze konfiguracje wynurzają się naturalnie
-
----
-
-#### ❌ Problem: "ProtonDB nie ma danych o performance"
+#### ❌ Problem: “YouTube benchmarks aren’t comparable”
 #### ✅ Solution:
-- HandheldLab WYMAGA FPS average/min/max
-- Wymaga TDP i resolution
-- Opcjonalnie: Proton version, custom settings, notes
-- ProtonDB mówi "czy", HandheldLab mówi "jak dobrze"
+- Standardized submission forms (TDP dropdown 5W–30W, resolution dropdown, preset dropdown)
+- Everyone reports the same metrics
+- Upvote-based sorting surfaces the best configs over time
 
 ---
 
-#### ❌ Problem: "Steam Deck Verified ignoruje inne handhelde"
+#### ❌ Problem: “ProtonDB has no performance data”
 #### ✅ Solution:
-- Support dla 12 devices na MVP (Steam Deck LCD/OLED, ROG Ally, Legion Go, AYANEO, GPD, etc.)
-- Device-agnostic = każdy handheld ma równe traktowanie
-- Filtry pozwalają porównać performance cross-device
+- HandheldLab REQUIRES FPS average/min/max
+- Requires TDP and resolution
+- Optional: Proton version, custom settings, notes
+- ProtonDB answers “whether,” HandheldLab answers “how well”
 
 ---
 
-#### ❌ Problem: "Reddit/Discord info przepada"
+#### ❌ Problem: “Steam Deck Verified ignores other handhelds”
 #### ✅ Solution:
-- Centralna baza danych (PostgreSQL)
-- Wyszukiwanie po game + device
-- Reports nie dezaktualizują się (są timestampowane + można dodać nowe dla nowych Proton)
-- SEO-friendly URLs: `/games/elden-ring` → Google indexuje
+- Support for 12 devices in MVP (Steam Deck LCD/OLED, ROG Ally, Legion Go, AYANEO, GPD, etc.)
+- Device-agnostic approach: every handheld is treated equally
+- Filters enable cross-device comparison
 
 ---
 
-#### ❌ Problem: "Nie wiem komu ufać"
+#### ❌ Problem: “Reddit/Discord info disappears”
+#### ✅ Solution:
+- Central database (PostgreSQL)
+- Searchable by game + device
+- Reports don’t “expire” (timestamped; users can submit new ones for newer Proton/patches)
+- SEO-friendly URLs: `/games/elden-ring` → indexed by Google
+
+---
+
+#### ❌ Problem: “I don’t know who to trust”
 #### ✅ Solution:
 - Admin verification (pending → verified badge)
-- Community upvotes (helpful reports wynurzają się)
-- Screenshot jako proof (nie można sfake'ować bez effort)
-- W v2: Reputation system dla trusted contributors
+- Community upvotes (helpful reports rise)
+- Screenshot as proof (faking requires real effort)
+- v2: reputation system for trusted contributors
 
 ---
 
 ### 3.3 User Journey Solved
 
-#### Persona A ("The Buyer") - Before HandheldLab:
-1. Googles "Elden Ring Steam Deck"
+#### Persona A (“The Buyer”) — Before HandheldLab:
+1. Googles “Elden Ring Steam Deck”
 2. Watches 3 YouTube videos (20 min)
-3. Checks ProtonDB (mówi "Gold" - nic nie wie)
-4. Scrolls Reddit (fragmentaryczne info)
+3. Checks ProtonDB (“Gold” — still unclear)
+4. Scrolls Reddit (fragmented info)
 5. **Still uncertain** → might not buy
 
-#### Persona A - With HandheldLab:
-1. Googles "Elden Ring Steam Deck performance"
+#### Persona A — With HandheldLab:
+1. Googles “Elden Ring Steam Deck performance”
 2. Lands on `/games/elden-ring`
 3. Filters: Steam Deck OLED
 4. Sees 12 verified reports sorted by upvotes
-5. Top report: "52 FPS avg (45-60), Medium, 15W, 800p, Proton 8.0" ← 47 upvotes
+5. Top report: “52 FPS avg (45–60), Medium, 15W, 800p, Proton 8.0” ← 47 upvotes
 6. **Decision made in <60 seconds** → buys confidently
 
 ---
 
-#### Persona B ("The Optimizer") - Before HandheldLab:
-1. Spends 2h optimizing Cyberpunk on ROG Ally
-2. Posts on Reddit with screenshot
-3. Gets 5 upvotes, post archived after 24h
-4. **No lasting impact, no credit**
+#### Persona B (“The Optimizer”) — Before HandheldLab:
+1. Spends 2 hours optimizing Cyberpunk on a ROG Ally
+2. Posts on Reddit with a screenshot
+3. Gets 5 upvotes, post archived quickly
+4. **No lasting impact, no durable credit**
 
-#### Persona B - With HandheldLab:
+#### Persona B — With HandheldLab:
 1. Optimizes Cyberpunk
-2. Submits report: screenshot + settings
+2. Submits a report: screenshot + settings
 3. Report gets verified (✅ badge)
 4. Gets 30+ upvotes over time
-5. Username visible on report → **builds reputation**
-6. Other users find his profile → see all his quality reports
-7. **Becomes trusted contributor** (v2: special badge)
-8. **Jego konfiguracja staje się domyślną rekomendacją dla setek kupujących.**
+5. Username is visible on the report → **builds reputation**
+6. Other users can browse their contributions
+7. **If the user deletes their account, reports remain, but author becomes `@[deleted]` (locked product rule).**
 
 ---
 
-#### Persona C ("Quality Gate") - Before HandheldLab:
-1. Platform doesn't exist
+#### Persona C (“The Quality Gate”) — Before HandheldLab:
+1. Platform doesn’t exist
 2. N/A
 
-#### Persona C - With HandheldLab:
-1. Reviews pending reports in admin panel
+#### Persona C — With HandheldLab:
+1. Reviews pending reports in the admin panel
 2. Checks screenshot vs reported FPS
 3. Sanity checks: FPS >200? TDP >30W? Screenshot <50KB? → auto-flag
-4. Approves/rejects with reason
-5. **<30 min/day** to maintain quality with 50-100 pending reports
+4. Approves/rejects with a reason
+5. **<30 min/day** to maintain quality with 50–100 pending reports
 
 ---
 
 ### 3.4 What HandheldLab IS and IS NOT
 
 #### ✅ IS:
-- Performance database with verified data
-- Decision tool for buyers
-- Recognition platform for contributors
-- Device-agnostic handheld resource
+- A performance database with verified data
+- A decision tool for buyers
+- A recognition platform for contributors (while accounts exist)
+- A device-agnostic handheld resource
 
 #### ❌ IS NOT:
-- Social network (no DMs, no follows, no feeds)
-- Benchmarking tool (nie robimy synthetic tests)
-- Game store (affiliate links możliwe, ale nie core)
-- ProtonDB competitor (komplementarne, nie competing)
-- YouTube alternative (nie robimy video benchmarks)
+- A social network (no DMs, no follows, no feeds)
+- A benchmarking tool (no synthetic tests)
+- A game store (affiliate links possible, but not core)
+- A ProtonDB competitor (complementary, not competing)
+- A YouTube alternative (no video benchmarks)
 
 ---
 
-### 3.5 Competitive Moat (Dlaczego Ktoś Inny Tego Nie Zrobi)
+### 3.5 Competitive Moat (Why Someone Else Won’t Easily Replicate This)
 
-**Network Effect:**
-- Więcej reports = więcej wartości
-- Więcej coverage (game × device pairs)
-- First mover advantage w niche
+**Network Effects:**
+- More reports = more value
+- More coverage (game × device pairs)
+- First-mover advantage in a niche
 
 **Quality Bar:**
-- Screenshot requirement = wysoki effort barrier
+- Screenshot requirement = high effort barrier
 - Admin verification = trust
 - Community upvotes = self-cleaning
 
 **Domain Expertise:**
-- Curated device list (nie chaos user-submitted devices)
-- Handheld-specific metrics (TDP, battery, not just FPS)
-- Understanding tradeoffs (nie tylko "max settings")
+- Curated device list (no chaos from user-submitted devices)
+- Handheld-specific metrics (TDP, battery tradeoffs, not just FPS)
+- Understanding tradeoffs (not just “max settings”)
 
 **Data Ownership:**
-- Własna baza danych (nie scraping)
-- User-generated ale verified
-- Trudna do zreplikowania bez critical mass
+- Proprietary database (no scraping)
+- User-generated but verified
+- Hard to replicate without critical mass
 
-**Najtrudniejsze do skopiowania nie jest UI ani technologia, ale zaufana, historyczna baza porównywalnych danych performance dla setek gier i urządzeń.**
+**The hardest thing to copy isn’t the UI or the tech — it’s a trusted, historical database of comparable performance data across hundreds of games and devices.**
 
 ---
 

@@ -1,7 +1,7 @@
 # HandheldLab - Technical Architecture Document
 
-**Version:** 1.0  
-**Last Updated:** January 10, 2026  
+**Version:** 1.1
+**Last Updated:** January 10, 2026
 **Status:** Complete - LOCKED ✅
 
 ---
@@ -25,173 +25,201 @@
 #### Frontend: Next.js 14 (App Router)
 
 **Why:**
-- **SSR for SEO:** Game pages crawlable by Google (critical for organic traffic)
-- **Server Components:** Reduce client bundle, faster initial load
-- **File-based routing:** Simple, predictable URL structure
-- **Vercel deployment:** Zero-config production deploy
-- **TypeScript native:** Type safety across stack
+
+* **SSR for SEO:** Game pages crawlable by Google (critical for organic traffic)
+* **Server Components:** Reduce client bundle, faster initial load
+* **File-based routing:** Simple, predictable URL structure
+* **Vercel deployment:** Zero-config production deploy
+* **TypeScript native:** Type safety across stack
 
 **Alternatives considered:**
-- ❌ SvelteKit: Smaller ecosystem, fewer Supabase examples
-- ❌ Remix: Requires BaaS adapter complexity
-- ❌ Create React App: No SSR, SEO dead
+
+* ❌ SvelteKit: Smaller ecosystem, fewer Supabase examples
+* ❌ Remix: Requires BaaS adapter complexity
+* ❌ Create React App: No SSR, SEO dead
 
 ---
 
 #### Database: Supabase (PostgreSQL)
 
 **Why:**
-- **PostgreSQL:** Industry standard, proven at scale
-- **Built-in Auth:** Email/password works out of box
-- **Row Level Security (RLS):** Database-level authorization (prevents accidental privilege escalation)
-- **Realtime (optional v2):** WebSocket support if needed
-- **Storage integrated:** Same platform for DB + files
-- **Free tier:** Generous (500MB DB, 1GB storage, 2GB bandwidth)
-- **Backups:** Automatic daily backups
+
+* **PostgreSQL:** Industry standard, proven at scale
+* **Built-in Auth:** Email/password works out of box
+* **Row Level Security (RLS):** Database-level authorization (prevents accidental privilege escalation)
+* **Realtime (optional v2):** WebSocket support if needed
+* **Storage integrated:** Same platform for DB + files
+* **Free tier:** Generous (500MB DB, 1GB storage, 2GB bandwidth)
+* **Backups:** Automatic daily backups
 
 **Alternatives considered:**
-- ❌ Firebase: NoSQL = harder to query (need joins for reports by game+device)
-- ❌ PlanetScale: MySQL, no built-in storage/auth
-- ❌ Self-hosted PostgreSQL: More control but ops overhead (backups, scaling, monitoring)
+
+* ❌ Firebase: NoSQL = harder to query (need joins for reports by game+device)
+* ❌ PlanetScale: MySQL, no built-in storage/auth
+* ❌ Self-hosted PostgreSQL: More control but ops overhead (backups, scaling, monitoring)
 
 ---
 
 #### Storage: Supabase Storage
 
 **Why:**
-- **Private buckets:** Screenshots not public by default
-- **Signed URLs:** Temporary access (1h expiry), secure
-- **User folder isolation:** Each user uploads to own folder
-- **Image optimization (future):** Can add Sharp transformations
-- **Same platform as DB:** Fewer moving parts
+
+* **Private buckets:** Screenshots not public by default
+* **Signed URLs:** Temporary access (1h expiry), secure
+* **User folder isolation:** Each user uploads to own folder
+* **Image optimization (future):** Can add Sharp transformations
+* **Same platform as DB:** Fewer moving parts
 
 **Signed URL Caching (MVP Guardrail):**
-- Signed URL TTL: 1 hour
-- UI caches signed URLs in memory per report for session duration
-- Reduces regeneration overhead on game page grids
+
+* Signed URL TTL: 1 hour
+* UI caches signed URLs in memory per report for session duration
+* Reduces regeneration overhead on game page grids
 
 **Alternatives considered:**
-- ❌ Cloudinary: Expensive for high-volume images ($89/mo for 25k transformations)
-- ❌ AWS S3: Requires separate setup, IAM complexity
-- ❌ Vercel Blob: Locked to Vercel, expensive ($0.15/GB)
+
+* ❌ Cloudinary: Expensive for high-volume images ($89/mo for 25k transformations)
+* ❌ AWS S3: Requires separate setup, IAM complexity
+* ❌ Vercel Blob: Locked to Vercel, expensive ($0.15/GB)
 
 ---
 
 #### Authentication: Supabase Auth
 
 **Why:**
-- **Email/password:** Standard, no OAuth complexity
-- **Email verification:** Built-in
-- **Session management:** JWT tokens, handled automatically
-- **Password reset:** Built-in flow
-- **@supabase/ssr pattern:** Works with Next.js App Router
+
+* **Email/password:** Standard, no OAuth complexity
+* **Email verification:** Built-in
+* **Session management:** JWT tokens, handled automatically
+* **Password reset:** Built-in flow
+* **@supabase/ssr pattern:** Works with Next.js App Router
 
 **Alternatives considered:**
-- ❌ NextAuth.js: More flexible but requires DB adapter setup
-- ❌ Auth0: Overkill for MVP, expensive ($25/mo for 1000 MAU)
-- ❌ Clerk: Great UX but $25/mo minimum
+
+* ❌ NextAuth.js: More flexible but requires DB adapter setup
+* ❌ Auth0: Overkill for MVP, expensive ($25/mo for 1000 MAU)
+* ❌ Clerk: Great UX but $25/mo minimum
 
 ---
 
 #### Styling: Tailwind CSS
 
 **Why:**
-- **Utility-first:** Fast iteration, no CSS file management
-- **Mobile-first:** Responsive by default
-- **No runtime:** CSS generated at build time (fast)
-- **Design system:** Consistent spacing/colors via config
+
+* **Utility-first:** Fast iteration, no CSS file management
+* **Mobile-first:** Responsive by default
+* **No runtime:** CSS generated at build time (fast)
+* **Design system:** Consistent spacing/colors via config
 
 **Alternatives considered:**
-- ❌ Styled Components: Runtime cost, harder to optimize
-- ❌ CSS Modules: More boilerplate
-- ❌ Plain CSS: Scaling issues (naming, specificity)
+
+* ❌ Styled Components: Runtime cost, harder to optimize
+* ❌ CSS Modules: More boilerplate
+* ❌ Plain CSS: Scaling issues (naming, specificity)
 
 ---
 
 #### UI Components: Radix UI + Headless
 
 **Why:**
-- **Accessible:** ARIA compliant out of box
-- **Unstyled:** Full control over design
-- **Composable:** Build complex components (modals, dropdowns)
-- **Small bundle:** Tree-shakeable
+
+* **Accessible:** ARIA compliant out of box
+* **Unstyled:** Full control over design
+* **Composable:** Build complex components (modals, dropdowns)
+* **Small bundle:** Tree-shakeable
 
 **Components used:**
-- `@radix-ui/react-dialog` - Modals (login, signup, screenshot view)
-- `@radix-ui/react-dropdown-menu` - User dropdown in header
-- `@radix-ui/react-select` - Form selects (device, TDP, etc.)
+
+* `@radix-ui/react-dialog` - Modals (login, signup, screenshot view)
+* `@radix-ui/react-dropdown-menu` - User dropdown in header
+* `@radix-ui/react-select` - Form selects (device, TDP, etc.)
 
 **Alternatives considered:**
-- ❌ shadcn/ui: Faster scaffolding, but we keep stricter design control by composing Radix directly
-- ❌ Material UI: Heavy bundle, design lock-in
-- ❌ Chakra UI: Runtime styling cost
+
+* ❌ shadcn/ui: Faster scaffolding, but we keep stricter design control by composing Radix directly
+* ❌ Material UI: Heavy bundle, design lock-in
+* ❌ Chakra UI: Runtime styling cost
 
 ---
 
 #### Deployment: Vercel
 
 **Why:**
-- **Zero config:** Push to GitHub = auto-deploy
-- **Preview deployments:** Test PRs before merge
-- **Free tier:** Sufficient for MVP (100GB bandwidth)
-- **Next.js optimized:** Made by same team
+
+* **Zero config:** Push to GitHub = auto-deploy
+* **Preview deployments:** Test PRs before merge
+* **Free tier:** Sufficient for MVP (100GB bandwidth)
+* **Next.js optimized:** Made by same team
 
 **Runtime Note:**
-- **API Routes (Route Handlers):** Default to Node.js runtime
-- **Some routes run on Node.js runtime** (required for Sharp image processing)
-- Edge Functions optional (not needed for MVP)
+
+* **API Routes (Route Handlers):** Default to Node.js runtime
+* **Some routes run on Node.js runtime** (required for Sharp image processing)
+* Edge Functions optional (not needed for MVP)
 
 **Alternatives considered:**
-- ❌ Netlify: Similar but worse Next.js support
-- ❌ Railway: Good but requires more config
-- ❌ Self-hosted VPS: Ops overhead
+
+* ❌ Netlify: Similar but worse Next.js support
+* ❌ Railway: Good but requires more config
+* ❌ Self-hosted VPS: Ops overhead
 
 ---
 
 #### Image Processing: Sharp (server-side)
 
 **Why:**
-- **Fast:** Native C++ bindings
-- **Optimize uploads:** Resize, compress before storage
-- **Thumbnails (v2):** Generate smaller versions for grid view
-- **No external service:** Runs in API routes
+
+* **Fast:** Native C++ bindings
+* **Optimize uploads:** Resize, compress before storage
+* **Thumbnails (v2):** Generate smaller versions for grid view
+* **No external service:** Runs in API routes
 
 **Runtime Constraint:**
-- **Runs in Node.js runtime route handler, not Edge**
-- **Used on upload path only** (thumbnails optional later)
+
+* **Runs in Node.js runtime route handler, not Edge**
+* **Used on upload path only** (thumbnails optional later)
 
 **Usage:**
-- Validate image dimensions
-- Compress to JPEG 85% quality
-- Strip metadata (privacy)
+
+* Validate image dimensions
+* Compress to JPEG 85% quality
+* Strip metadata (privacy)
 
 **Alternatives considered:**
-- ❌ Browser-side compression: Unreliable (user can bypass)
-- ❌ Cloudinary: External dependency, costs
+
+* ❌ Browser-side compression: Unreliable (user can bypass)
+* ❌ Cloudinary: External dependency, costs
 
 ---
 
 ### 1.2 Supporting Libraries
 
 **Forms & Validation:**
-- `react-hook-form` - Form state management (upload form)
-- `zod` - Schema validation (type-safe, composable)
+
+* `react-hook-form` - Form state management (upload form)
+* `zod` - Schema validation (type-safe, composable)
 
 **Date/Time:**
-- `date-fns` - Lightweight date utilities (relative timestamps)
+
+* `date-fns` - Lightweight date utilities (relative timestamps)
 
 **Icons:**
-- `lucide-react` - Icon library (heart, search, user, etc.)
+
+* `lucide-react` - Icon library (heart, search, user, etc.)
 
 **Utilities:**
-- `clsx` + `tailwind-merge` - ClassName management (cn() helper)
+
+* `clsx` + `tailwind-merge` - ClassName management (cn() helper)
 
 **Analytics & Monitoring:**
-- **Analytics:** Plausible / PostHog / Google Analytics 4 (decision deferred to implementation)
-  - Track: MAU, session duration, search usage, device filter engagement
-  - Required for Success Metrics validation
-- **Error Monitoring:** Sentry (optional, consider if error rates spike)
-  - Track: upload failures, signed URL errors, API route failures
+
+* **Analytics:** Plausible / PostHog / Google Analytics 4 (decision deferred to implementation)
+
+  * Track: MAU, session duration, search usage, device filter engagement
+  * Required for Success Metrics validation
+* **Error Monitoring:** Sentry (optional, consider if error rates spike)
+
+  * Track: upload failures, signed URL errors, API route failures
 
 ---
 
@@ -204,6 +232,7 @@
 ---
 
 ### 1.4 Stack Diagram (Visual)
+
 ```
 ┌─────────────────────────────────────────┐
 │  User (Browser)                         │
@@ -233,6 +262,7 @@
 ### 1.5 Critical Dependencies
 
 **Core dependencies** (example versions, check for latest at implementation):
+
 ```
 next (^14.x)
 react (^18.x)
@@ -257,6 +287,7 @@ typescript (^5.x)
 ---
 
 ### 1.6 Environment Variables
+
 ```bash
 # Supabase (from dashboard)
 NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
@@ -268,12 +299,14 @@ NEXT_PUBLIC_APP_URL=https://handheldlab.com # for email links
 ```
 
 **Security Notes:**
-- `NEXT_PUBLIC_*` = exposed to browser (safe for anon key)
-- `SUPABASE_SERVICE_ROLE_KEY` = bypasses RLS entirely
-  - **Service role only in server routes for admin actions that still verify `is_admin` explicitly**
-  - **Prefer: use user session + RLS whenever possible** (service role is last resort)
-  - Example valid use: admin bulk operations, scheduled jobs
-  - Example WRONG use: regular API routes (use user session instead)
+
+* `NEXT_PUBLIC_*` = exposed to browser (safe for anon key)
+* `SUPABASE_SERVICE_ROLE_KEY` = bypasses RLS entirely
+
+  * **Service role only in server routes for admin actions that still verify `is_admin` explicitly**
+  * **Prefer: use user session + RLS whenever possible** (service role is last resort)
+  * Example valid use: admin bulk operations, scheduled jobs
+  * Example WRONG use: regular API routes (use user session instead)
 
 ---
 
@@ -284,6 +317,7 @@ NEXT_PUBLIC_APP_URL=https://handheldlab.com # for email links
 #### Table: `profiles`
 
 **Purpose:** User account metadata (extends Supabase Auth)
+
 ```sql
 CREATE TABLE profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -303,27 +337,31 @@ CREATE INDEX idx_profiles_is_admin ON profiles(is_admin) WHERE is_admin = true;
 ```
 
 **Columns:**
-- `id` (UUID, PK): References `auth.users.id` (Supabase Auth table)
-- `username` (TEXT, UNIQUE, NOT NULL): Public display name, 3-20 chars, alphanumeric + hyphens/underscores
-- `avatar_url` (TEXT, NULLABLE): Future feature, placeholder in MVP
-- `is_admin` (BOOLEAN, NOT NULL, DEFAULT false): Admin flag for verification queue access
-- `created_at` (TIMESTAMPTZ, NOT NULL): Account creation timestamp
-- `updated_at` (TIMESTAMPTZ, NOT NULL): Last profile update
+
+* `id` (UUID, PK): References `auth.users.id` (Supabase Auth table)
+* `username` (TEXT, UNIQUE, NOT NULL): Public display name, 3-20 chars, alphanumeric + hyphens/underscores
+* `avatar_url` (TEXT, NULLABLE): Future feature, placeholder in MVP
+* `is_admin` (BOOLEAN, NOT NULL, DEFAULT false): Admin flag for verification queue access
+* `created_at` (TIMESTAMPTZ, NOT NULL): Account creation timestamp
+* `updated_at` (TIMESTAMPTZ, NOT NULL): Last profile update
 
 **Constraints:**
-- `username_length`: 3-20 characters
-- `username_format`: Only letters, numbers, hyphens, underscores
-- FK to `auth.users`: Cascade delete (if user deleted in Auth, profile deleted)
+
+* `username_length`: 3-20 characters
+* `username_format`: Only letters, numbers, hyphens, underscores
+* FK to `auth.users`: Cascade delete (if user deleted in Auth, profile deleted)
 
 **Indexes:**
-- `idx_profiles_username`: Fast username lookups (login, profile pages)
-- `idx_profiles_is_admin`: Partial index for admin checks (small subset)
+
+* `idx_profiles_username`: Fast username lookups (login, profile pages)
+* `idx_profiles_is_admin`: Partial index for admin checks (small subset)
 
 ---
 
 #### Table: `devices`
 
 **Purpose:** Curated list of handheld gaming devices
+
 ```sql
 CREATE TABLE devices (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -356,6 +394,7 @@ CREATE INDEX idx_devices_sort_order ON devices(sort_order);
 #### Table: `games`
 
 **Purpose:** Game catalog (hybrid: curated seed + user-submitted pending)
+
 ```sql
 CREATE TABLE games (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -386,12 +425,18 @@ CREATE INDEX idx_games_submitted_by ON games(submitted_by);
 #### Table: `performance_reports`
 
 **Purpose:** Core data - user-submitted performance configurations
+
+**Important (Product Decision):** Reports must remain after a user deletes their account.
+This means `user_id` is nullable and uses `ON DELETE SET NULL`. UI treats missing user as `@[deleted]`.
+
 ```sql
 CREATE TABLE performance_reports (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   game_id UUID NOT NULL REFERENCES games(id) ON DELETE CASCADE,
   device_id UUID NOT NULL REFERENCES devices(id) ON DELETE RESTRICT,
-  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+
+  -- NOTE: nullable to preserve reports after account deletion
+  user_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
   
   screenshot_storage_path TEXT NOT NULL,
   
@@ -466,16 +511,19 @@ CREATE INDEX idx_reports_game_device_tdp ON performance_reports(game_id, device_
   WHERE verification_status = 'verified';
 ```
 
-**Note:**
-- `screenshot_storage_path` stores path only - signed URLs generated on-demand in API/server components, NOT stored in DB
-- `upvotes` counter maintained by trigger (see 2.4)
-- `view_count` incremented atomically: `UPDATE ... SET view_count = view_count + 1`
+**Notes:**
+
+* `screenshot_storage_path` stores path only - signed URLs generated on-demand in API/server components, NOT stored in DB
+* `upvotes` counter maintained by trigger (see 2.4)
+* `view_count` incremented atomically: `UPDATE ... SET view_count = view_count + 1`
+* If `user_id` is NULL, author is treated as **anonymous/deleted** in the UI (`@[deleted]`)
 
 ---
 
 #### Table: `performance_votes`
 
 **Purpose:** Upvote tracking (one vote per user per report)
+
 ```sql
 CREATE TABLE performance_votes (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -496,6 +544,7 @@ CREATE INDEX idx_votes_user ON performance_votes(user_id);
 ---
 
 ### 2.2 Relationships & ER Diagram
+
 ```
 ┌─────────────────┐
 │   auth.users    │ (Supabase managed)
@@ -506,45 +555,51 @@ CREATE INDEX idx_votes_user ON performance_votes(user_id);
 ┌─────────────────┐
 │    profiles     │
 │─────────────────│
-│ id (PK, FK)     │◄─────────────────────┐
-│ username        │                      │
-│ is_admin        │                      │ M:1
-└────────┬────────┘                      │
-         │                               │
-         │ M:1 (CASCADE)          ┌──────┴────────┐
-         │                        │ performance_  │
-         ▼                        │   reports     │
-┌─────────────────┐               │───────────────│
-│     games       │               │ id (PK)       │
-│─────────────────│               │ game_id (FK)  │───┐
-│ id (PK)         │◄──────────────│ device_id (FK)│   │
-│ name            │    M:1        │ user_id (FK)  │   │
-│ slug            │    (CASCADE)  │ screenshot_*  │   │
-│ status          │               │ fps_*         │   │
-└─────────────────┘               │ tdp_watts     │   │
-                                  │ ...           │   │
-                                  │ upvotes       │   │ 1:M
-┌─────────────────┐               └───────┬───────┘   │ (CASCADE)
-│    devices      │                       │           │
-│─────────────────│                       │           │
-│ id (PK)         │                       │ M:1       ▼
-│ name            │───────────────────────┘    ┌──────────────┐
-│ slug            │    M:1                     │ performance_ │
-│ manufacturer    │    (RESTRICT)              │   votes      │
-└─────────────────┘                            │──────────────│
-                                               │ id (PK)      │
-                                               │ report_id(FK)│
-                                               │ user_id (FK) │
-                                               └──────────────┘
+│ id (PK, FK)     │◄─────────────────────────────┐
+│ username        │                              │ M:1
+│ is_admin        │                              │ (author optional)
+└────────┬────────┘                              │
+         │                                       │
+         │ M:1 (SET NULL on delete)              │
+         ▼                                       │
+┌─────────────────┐               ┌──────────────┴─────────────┐
+│     games       │               │     performance_reports     │
+│─────────────────│               │─────────────────────────────│
+│ id (PK)         │◄──────────────│ game_id (FK, CASCADE)       │
+│ name            │               │ device_id (FK, RESTRICT)    │
+│ slug            │               │ user_id (FK, SET NULL)      │
+│ status          │               │ screenshot_storage_path     │
+└─────────────────┘               │ fps_*, tdp_watts, ...       │
+                                  │ verification_status         │
+                                  │ upvotes                     │
+                                  └───────────┬─────────────────┘
+                                              │ 1:M (CASCADE)
+                                              ▼
+                                      ┌──────────────────┐
+                                      │ performance_votes │
+                                      │──────────────────│
+                                      │ report_id (FK)    │
+                                      │ user_id (FK)      │
+                                      └──────────────────┘
+
+┌─────────────────┐
+│    devices      │
+│─────────────────│
+│ id (PK)         │
+│ slug            │
+│ ...             │
+└─────────────────┘
 ```
 
 **Foreign Key Behaviors:**
-- `profiles.id → auth.users.id`: CASCADE (user deleted = profile deleted)
-- `performance_reports.user_id → profiles.id`: CASCADE (user deleted = reports deleted)
-- `performance_reports.game_id → games.id`: CASCADE (game deleted = reports deleted)
-- `performance_reports.device_id → devices.id`: RESTRICT (can't delete device with reports)
-- `performance_votes.report_id → performance_reports.id`: CASCADE (report deleted = votes deleted)
-- `performance_votes.user_id → profiles.id`: CASCADE (user deleted = votes deleted)
+
+* `profiles.id → auth.users.id`: CASCADE (user deleted = profile deleted)
+* `performance_reports.user_id → profiles.id`: **SET NULL (user deleted = reports remain anonymous)**
+* `performance_reports.game_id → games.id`: CASCADE (game deleted = reports deleted)
+* `performance_reports.device_id → devices.id`: RESTRICT (can't delete device with reports)
+* `performance_votes.report_id → performance_reports.id`: CASCADE (report deleted = votes deleted)
+* `performance_votes.user_id → profiles.id`: CASCADE (user deleted = votes deleted)
+* `games.submitted_by → profiles.id`: SET NULL (submitter deleted = game remains)
 
 ---
 
@@ -553,20 +608,23 @@ CREATE INDEX idx_votes_user ON performance_votes(user_id);
 #### 2.3.1 RLS Overview
 
 **Philosophy:**
-- **Defense in depth:** RLS enforces authorization at database level
-- **Cannot be bypassed** by buggy API code (unless using service role key)
-- **Policies match user roles:** Anonymous, Authenticated, Admin
-- **Explicit over implicit:** Policies clearly state what's allowed
-- **Privacy-first:** Limit data exposure to minimum necessary
+
+* **Defense in depth:** RLS enforces authorization at database level
+* **Cannot be bypassed** by buggy API code (unless using service role key)
+* **Policies match user roles:** Anonymous, Authenticated, Admin
+* **Explicit over implicit:** Policies clearly state what's allowed
+* **Privacy-first:** Limit data exposure to minimum necessary
 
 **Important:**
-- Service role key bypasses ALL RLS (use sparingly, only in admin routes with explicit `is_admin` checks)
-- User session automatically available in policies via `auth.uid()`
-- **SELECT policies are additive (OR-ed)** - authenticated users get both public and authenticated policies
+
+* Service role key bypasses ALL RLS (use sparingly, only in admin routes with explicit `is_admin` checks)
+* User session automatically available in policies via `auth.uid()`
+* **SELECT policies are additive (OR-ed)** - authenticated users get both public and authenticated policies
 
 ---
 
 #### Table: `profiles`
+
 ```sql
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 
@@ -582,6 +640,7 @@ WITH CHECK (auth.uid() = id);
 ```
 
 **Public Profiles View (Privacy-Safe):**
+
 ```sql
 CREATE VIEW public_profiles AS
 SELECT 
@@ -593,13 +652,20 @@ GRANT SELECT ON public_profiles TO anon, authenticated;
 ```
 
 **Rationale:**
-- Direct table access blocked for anonymous users
-- View exposes only necessary fields for report attribution
-- UPDATE own: Users can modify profile, but NOT is_admin
+
+* Direct table access blocked for anonymous users
+* View exposes only necessary fields for report attribution
+* UPDATE own: Users can modify profile, but NOT is_admin
+
+**Anonymous Author Behavior:**
+
+* When `performance_reports.user_id` is NULL (deleted account), join to `public_profiles` will return NULL.
+* UI must render author fallback as `@[deleted]`.
 
 ---
 
 #### Table: `devices`
+
 ```sql
 ALTER TABLE devices ENABLE ROW LEVEL SECURITY;
 
@@ -612,6 +678,7 @@ USING (is_active = true);
 ---
 
 #### Table: `games`
+
 ```sql
 ALTER TABLE games ENABLE ROW LEVEL SECURITY;
 
@@ -642,6 +709,7 @@ WITH CHECK (
 ---
 
 #### Table: `performance_reports`
+
 ```sql
 ALTER TABLE performance_reports ENABLE ROW LEVEL SECURITY;
 
@@ -667,9 +735,12 @@ WITH CHECK (
 );
 ```
 
+**Note:** Deleted users have `user_id = NULL` in reports. Those reports remain visible publicly only if verified.
+
 ---
 
 #### Table: `performance_votes`
+
 ```sql
 ALTER TABLE performance_votes ENABLE ROW LEVEL SECURITY;
 
@@ -693,14 +764,16 @@ USING (user_id = auth.uid());
 ```
 
 **Rationale:**
-- SELECT own only: Prevents user behavior tracking, scales better
-- Query pattern: `SELECT * FROM performance_votes WHERE user_id = auth.uid() AND report_id IN (...)`
+
+* SELECT own only: Prevents user behavior tracking, scales better
+* Query pattern: `SELECT * FROM performance_votes WHERE user_id = auth.uid() AND report_id IN (...)`
 
 ---
 
 #### Admin Operations (Service Role Pattern)
 
 **Critical Security Rules:**
+
 ```typescript
 // ✅ CORRECT Pattern:
 const supabaseUser = createClient(); // User's session
@@ -721,6 +794,7 @@ const supabaseAdmin = createClient(
 ```
 
 **SQL Function:**
+
 ```sql
 CREATE OR REPLACE FUNCTION is_user_admin()
 RETURNS BOOLEAN AS $$
@@ -738,6 +812,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 ### 2.4 Triggers & Functions
 
 #### Auto-Create Profile on Signup
+
 ```sql
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
@@ -771,6 +846,7 @@ CREATE TRIGGER on_auth_user_created
 ---
 
 #### Maintain Upvote Counter
+
 ```sql
 CREATE OR REPLACE FUNCTION public.increment_report_upvotes()
 RETURNS TRIGGER AS $$
@@ -806,6 +882,7 @@ CREATE TRIGGER on_vote_deleted
 ---
 
 #### Auto-Update Timestamps
+
 ```sql
 CREATE OR REPLACE FUNCTION public.handle_updated_at()
 RETURNS TRIGGER AS $$
@@ -834,6 +911,7 @@ CREATE TRIGGER reports_set_updated_at
 ---
 
 #### Admin Approve Report (Atomic Transaction)
+
 ```sql
 CREATE OR REPLACE FUNCTION admin_approve_report(
   p_report_id UUID,
@@ -881,25 +959,32 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 #### Authentication Routes (Supabase Auth)
 
 **Not custom API routes - built into Supabase:**
-- `POST /auth/v1/signup`
-- `POST /auth/v1/token?grant_type=password`
-- `POST /auth/v1/logout`
-- `POST /auth/v1/recover`
-- `GET /auth/v1/verify`
+
+* `POST /auth/v1/signup`
+* `POST /auth/v1/token?grant_type=password`
+* `POST /auth/v1/logout`
+* `POST /auth/v1/recover`
+* `GET /auth/v1/verify`
 
 **Custom callback:**
-- `GET /auth/callback` - Email confirmation redirect
+
+* `GET /auth/callback` - Email confirmation redirect
 
 ---
 
 #### Public Queries (Server Components)
 
 **Not API routes - direct Supabase queries:**
-- `getGameBySlug(slug)` - Fetch game metadata
-- `getReportsForGame(gameId, filters, sort, offset)` - Fetch reports
-- `getUserVotesForReports(userId, reportIds)` - Fetch vote state map
-- `getPopularGames(limit)` - Homepage grid
-- `getUserReports(userId)` - Profile page
+
+* `getGameBySlug(slug)` - Fetch game metadata
+* `getReportsForGame(gameId, filters, sort, offset)` - Fetch reports
+* `getUserVotesForReports(userId, reportIds)` - Fetch vote state map
+* `getPopularGames(limit)` - Homepage grid
+* `getUserReports(userId)` - Profile page
+
+**Author Rendering Rule:**
+
+* If joined `public_profiles` is NULL (deleted user), UI renders `@[deleted]`.
 
 ---
 
@@ -907,10 +992,11 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 ##### POST /api/reports
 
-**Auth:** Required  
+**Auth:** Required
 **Content-Type:** `multipart/form-data`
 
 **Request (FormData):**
+
 ```typescript
 {
   screenshot: File; // Max 5MB, jpeg/png
@@ -928,6 +1014,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 ```
 
 **Response (201):**
+
 ```typescript
 {
   reportId: string;
@@ -945,6 +1032,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 **Auth:** Required
 
 **Request:**
+
 ```typescript
 {
   name: string; // Trimmed, spaces collapsed
@@ -953,6 +1041,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 ```
 
 **Response (201):**
+
 ```typescript
 {
   gameId: string;
@@ -962,6 +1051,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 ```
 
 **Response (409 - Conflict):**
+
 ```typescript
 {
   error: 'Game already exists';
@@ -979,6 +1069,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 **Auth:** Required
 
 **Response (200/201):**
+
 ```typescript
 {
   upvoted: true;
@@ -994,6 +1085,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 **Auth:** Required
 
 **Response (200):**
+
 ```typescript
 {
   upvoted: false;
@@ -1009,6 +1101,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 **Auth:** Admin only
 
 **Response (200):**
+
 ```typescript
 {
   reportId: string;
@@ -1028,6 +1121,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 **Auth:** Admin only
 
 **Request:**
+
 ```typescript
 {
   reason: 'invalid_screenshot' | 'unrealistic_data' | 'duplicate' | 'other';
@@ -1036,6 +1130,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 ```
 
 **Response (200):**
+
 ```typescript
 {
   reportId: string;
@@ -1049,6 +1144,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 ---
 
 ### 3.2 Request/Response Schemas (Zod)
+
 ```typescript
 // src/lib/validations/report.ts
 import { z } from 'zod';
@@ -1097,12 +1193,14 @@ export const rejectReportSchema = z.object({
 ### 3.3 Error Handling
 
 **HTTP Status Codes:**
-- 200 OK, 201 Created
-- 400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found
-- 409 Conflict, 413 Payload Too Large, 415 Unsupported Media Type
-- 500 Internal Server Error
+
+* 200 OK, 201 Created
+* 400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found
+* 409 Conflict, 413 Payload Too Large, 415 Unsupported Media Type
+* 500 Internal Server Error
 
 **Error Response Format:**
+
 ```typescript
 {
   error: string;
@@ -1114,6 +1212,7 @@ export const rejectReportSchema = z.object({
 ```
 
 **Error Handler:**
+
 ```typescript
 // src/lib/api/error-handler.ts
 import { NextResponse } from 'next/server';
@@ -1180,6 +1279,7 @@ export function handleAPIError(error: unknown, requestId?: string) {
 ### 4.1 Auth Flow (Supabase Auth)
 
 **Sign Up Flow:**
+
 1. User submits email/password/username
 2. Supabase creates auth.users row
 3. Trigger creates profiles row
@@ -1187,12 +1287,14 @@ export function handleAPIError(error: unknown, requestId?: string) {
 5. User confirms → session created
 
 **Login Flow:**
+
 1. User enters email/password
 2. Supabase verifies credentials
 3. Session + JWT tokens returned
 4. Cookie set (httpOnly, secure, sameSite=lax)
 
 **Logout Flow:**
+
 1. User clicks logout
 2. Session invalidated
 3. Cookie cleared
@@ -1202,6 +1304,7 @@ export function handleAPIError(error: unknown, requestId?: string) {
 ### 4.2 Middleware (Protected Routes)
 
 **Purpose:** UX-level gate (NOT primary security)
+
 ```typescript
 // src/middleware.ts
 import { createServerClient } from '@supabase/ssr'
@@ -1247,19 +1350,23 @@ export async function middleware(request: NextRequest) {
 ### 4.3 Authorization Levels
 
 **Level 1: Anonymous**
-- View approved games, verified reports, active devices, public profiles
-- Cannot submit, upvote, or access admin
+
+* View approved games, verified reports, active devices, public profiles
+* Cannot submit, upvote, or access admin
 
 **Level 2: Authenticated**
-- All anonymous access +
-- Submit reports/games, upvote, view own submissions, update profile
-- Cannot see others' private data or access admin
+
+* All anonymous access +
+* Submit reports/games, upvote, view own submissions, update profile
+* Cannot see others' private data or access admin
 
 **Level 3: Admin**
-- All authenticated access +
-- Verification queue, approve/reject, manage devices
+
+* All authenticated access +
+* Verification queue, approve/reject, manage devices
 
 **Admin Pattern (Two-Step):**
+
 ```typescript
 // 1. Check admin via USER session
 const { data: { user } } = await supabaseUser.auth.getUser();
@@ -1275,9 +1382,11 @@ const supabaseAdmin = createClient(..., SERVICE_ROLE_KEY);
 ### 4.4 CSRF Protection
 
 **Mitigations:**
-- httpOnly cookies
-- sameSite=lax (reduces risk)
-- **Primary defense: Origin header validation**
+
+* httpOnly cookies
+* sameSite=lax (reduces risk)
+* **Primary defense: Origin header validation**
+
 ```typescript
 // src/lib/api/validate-origin.ts
 export function validateOrigin(request: NextRequest): boolean {
@@ -1295,6 +1404,7 @@ if (!validateOrigin(request)) {
 ---
 
 ### 4.5 Client-Side Auth State
+
 ```typescript
 // src/contexts/AuthContext.tsx
 'use client'
@@ -1354,14 +1464,16 @@ export function AuthProvider({ children }) {
 **Bucket:** `screenshots` (private)
 
 **Settings:**
-- Public: false
-- Max size: 5MB
-- Allowed types: image/jpeg, image/png
-- Path structure: `{userId}/{timestamp}-{random}.{ext}`
+
+* Public: false
+* Max size: 5MB
+* Allowed types: image/jpeg, image/png
+* Path structure: `{userId}/{timestamp}-{random}.{ext}`
 
 ---
 
 ### 5.2 Storage Policies
+
 ```sql
 CREATE POLICY "users_upload_own_folder"
 ON storage.objects FOR INSERT
@@ -1385,6 +1497,7 @@ USING (
 ---
 
 ### 5.3 Upload Flow
+
 ```typescript
 // src/lib/storage/upload.ts
 export async function uploadScreenshot(
@@ -1425,6 +1538,7 @@ export async function uploadScreenshot(
 ### 5.4 Server-Side Verification (CRITICAL)
 
 **After upload, before DB insert:**
+
 ```typescript
 // src/app/api/reports/route.ts
 const storagePath = formData.get('screenshotPath') as string
@@ -1454,6 +1568,7 @@ await insertReport({ ...data, screenshot_storage_path: storagePath })
 ---
 
 ### 5.5 Signed URL Generation
+
 ```typescript
 // src/lib/storage/signed-urls.ts
 const urlCache = new Map<string, { url: string; expiresAt: number }>()
@@ -1486,12 +1601,14 @@ export async function createSignedUrl(
 **Cache:** Best-effort per instance (not distributed)
 
 **Real MVP Guardrail:**
-- Pagination (12 reports/page)
-- Lazy loading (generate URLs for visible reports only)
+
+* Pagination (12 reports/page)
+* Lazy loading (generate URLs for visible reports only)
 
 ---
 
 ### 5.6 Image Optimization (Next.js)
+
 ```typescript
 import Image from 'next/image'
 
@@ -1508,6 +1625,7 @@ import Image from 'next/image'
 ```
 
 **Configuration:**
+
 ```typescript
 // next.config.js
 module.exports = {
@@ -1532,6 +1650,7 @@ module.exports = {
 ### 6.1 Threat Model (MVP)
 
 **In-Scope:**
+
 1. Unauthorized access (RLS + middleware + API auth)
 2. Data injection (Zod validation, parameterized queries)
 3. CSRF (sameSite=lax + Origin validation)
@@ -1539,9 +1658,10 @@ module.exports = {
 5. Spam (admin verification, unique constraints)
 
 **Out-of-Scope:**
-- DDoS (rely on infrastructure)
-- Advanced threats (not realistic for MVP)
-- Phishing (user education, 2FA in v2)
+
+* DDoS (rely on infrastructure)
+* Advanced threats (not realistic for MVP)
+* Phishing (user education, 2FA in v2)
 
 ---
 
@@ -1550,11 +1670,13 @@ module.exports = {
 **Client:** react-hook-form + Zod (UX only)
 
 **Server:** Zod schemas (security)
+
 ```typescript
 const validated = createReportSchema.parse(data)
 ```
 
 **Sanitization:**
+
 ```typescript
 function sanitizeUsername(input: string): string {
   return input
@@ -1578,6 +1700,7 @@ function sanitizeNotes(input: string): string {
 ---
 
 ### 6.3 Security Headers
+
 ```typescript
 // next.config.js
 module.exports = {
@@ -1601,15 +1724,15 @@ module.exports = {
 
 ### 6.4 Security Checklist
 
-- [ ] All secrets in environment variables
-- [ ] Service role key NEVER exposed to client
-- [ ] RLS enabled on all tables
-- [ ] File upload validation (type, size, path) - client + server
-- [ ] Server-side path ownership + existence verification
-- [ ] Origin header validation on mutations
-- [ ] Security headers configured
-- [ ] HTTPS enforced (Vercel automatic)
-- [ ] Database backups enabled (Supabase automatic)
+* [ ] All secrets in environment variables
+* [ ] Service role key NEVER exposed to client
+* [ ] RLS enabled on all tables
+* [ ] File upload validation (type, size, path) - client + server
+* [ ] Server-side path ownership + existence verification
+* [ ] Origin header validation on mutations
+* [ ] Security headers configured
+* [ ] HTTPS enforced (Vercel automatic)
+* [ ] Database backups enabled (Supabase automatic)
 
 ---
 
@@ -1618,22 +1741,25 @@ module.exports = {
 ### 7.1 Overview
 
 **Goals:**
-- Lighthouse >80 on public pages
-- Game page loads <3s (TTI)
-- API routes <500ms (p95)
-- Zero N+1 on critical pages (homepage, game page)
-- Acceptable UX at 10k MAU
+
+* Lighthouse >80 on public pages
+* Game page loads <3s (TTI)
+* API routes <500ms (p95)
+* Zero N+1 on critical pages (homepage, game page)
+* Acceptable UX at 10k MAU
 
 ---
 
 ### 7.2 Database Performance
 
 **Index Strategy:**
-- ✅ Composite indexes for sort + filter (game_id + device_id + upvotes DESC, etc.)
-- ✅ Partial indexes WHERE verified (reduces index size)
-- ✅ User/admin indexes for profile/queue
+
+* ✅ Composite indexes for sort + filter (game_id + device_id + upvotes DESC, etc.)
+* ✅ Partial indexes WHERE verified (reduces index size)
+* ✅ User/admin indexes for profile/queue
 
 **Pagination (CRITICAL):**
+
 ```typescript
 async function getReportsForGame(
   gameId: string,
@@ -1664,7 +1790,12 @@ async function getReportsForGame(
 }
 ```
 
+**Anonymous author handling:**
+
+* `user` join may be NULL (deleted user), so UI must render `@[deleted]`.
+
 **N+1 Prevention:**
+
 ```typescript
 // ✅ GOOD: Single query with joins
 const { data: reports } = await supabase
@@ -1686,12 +1817,14 @@ const { data: reports } = await supabase
 ### 7.3 API Performance
 
 **Targets:**
-- GET (Server Components): <200ms (p95)
-- POST /api/reports: <1s (p95)
-- POST vote: <300ms (p95)
-- Admin routes: <500ms (p95)
+
+* GET (Server Components): <200ms (p95)
+* POST /api/reports: <1s (p95)
+* POST vote: <300ms (p95)
+* Admin routes: <500ms (p95)
 
 **Parallelization:**
+
 ```typescript
 // ✅ GOOD: Parallel
 const { data: { user } } = await supabase.auth.getUser()
@@ -1707,6 +1840,7 @@ const [profile, reports] = await Promise.all([
 ### 7.4 Frontend Performance
 
 **Code Splitting:**
+
 ```typescript
 import dynamic from 'next/dynamic'
 
@@ -1716,6 +1850,7 @@ const AdminPanel = dynamic(() => import('@/components/AdminPanel'), {
 ```
 
 **Image Optimization:**
+
 ```typescript
 <Image
   src={signedUrl}
@@ -1734,13 +1869,16 @@ const AdminPanel = dynamic(() => import('@/components/AdminPanel'), {
 ### 7.5 Caching Strategy
 
 **Browser:**
-- Static assets: 1 year
-- HTML: stale-while-revalidate (ISR)
+
+* Static assets: 1 year
+* HTML: stale-while-revalidate (ISR)
 
 **Server:**
-- React automatic request deduplication (no additional caching needed)
+
+* React automatic request deduplication (no additional caching needed)
 
 **ISR:**
+
 ```typescript
 // src/app/games/[slug]/page.tsx
 export const revalidate = 300 // 5 minutes
@@ -1758,62 +1896,71 @@ export async function generateStaticParams() {
 ### 7.6 Performance Checklist
 
 **Database:**
-- [ ] All frequent queries indexed
-- [ ] Pagination enforced (max 50 items, offset ≤500)
-- [ ] Zero N+1 on homepage + game page
-- [ ] Query count <10 per page
+
+* [ ] All frequent queries indexed
+* [ ] Pagination enforced (max 50 items, offset ≤500)
+* [ ] Zero N+1 on homepage + game page
+* [ ] Query count <10 per page
 
 **API:**
-- [ ] Response times <500ms (p95)
-- [ ] Parallel async where possible
-- [ ] Origin validation on mutations
+
+* [ ] Response times <500ms (p95)
+* [ ] Parallel async where possible
+* [ ] Origin validation on mutations
 
 **Frontend:**
-- [ ] Images lazy-loaded
-- [ ] Heavy components code-split
-- [ ] Bundle <200KB
-- [ ] No layout shift
+
+* [ ] Images lazy-loaded
+* [ ] Heavy components code-split
+* [ ] Bundle <200KB
+* [ ] No layout shift
 
 **Caching:**
-- [ ] Static assets cached (1 year)
-- [ ] ISR enabled (5 min revalidate)
-- [ ] Signed URLs generated runtime (not static)
+
+* [ ] Static assets cached (1 year)
+* [ ] ISR enabled (5 min revalidate)
+* [ ] Signed URLs generated runtime (not static)
 
 **Monitoring:**
-- [ ] Vercel Analytics enabled
-- [ ] Lighthouse baseline tracked
-- [ ] Query performance reviewed weekly
+
+* [ ] Vercel Analytics enabled
+* [ ] Lighthouse baseline tracked
+* [ ] Query performance reviewed weekly
 
 ---
 
 ### 7.7 Scalability Guardrails
 
 **❌ Don't:**
-- Fetch all reports for a game (always paginate)
-- Load all games in dropdown (limit 100, search in v2)
-- Generate 100 signed URLs at once (paginate, lazy load)
-- Add real-time features without infrastructure
+
+* Fetch all reports for a game (always paginate)
+* Load all games in dropdown (limit 100, search in v2)
+* Generate 100 signed URLs at once (paginate, lazy load)
+* Add real-time features without infrastructure
 
 **✅ Do:**
-- Paginate everything (default 12, max 50, offset ≤500)
-- Use database for sorting/filtering
-- Cache signed URLs (best-effort, 50% TTL)
-- Monitor weekly
-- Plan for 10x but don't over-engineer
+
+* Paginate everything (default 12, max 50, offset ≤500)
+* Use database for sorting/filtering
+* Cache signed URLs (best-effort, 50% TTL)
+* Monitor weekly
+* Plan for 10x but don't over-engineer
 
 ---
 
 ### 7.8 When to Optimize
 
 **Optimize ONLY if:**
+
 1. Measurable problem (Lighthouse <80 OR p95 >500ms OR user complaints)
 2. High impact (affects >50% users OR critical path)
 3. Low effort (<4h OR config change)
 
 **Example:**
-- "Game page Lighthouse 65" → Optimize (high impact)
-- "Admin panel slow" → Defer (low traffic)
-- "Could use Redis" → Defer (no data proving need)
+
+* "Game page Lighthouse 65" → Optimize (high impact)
+* "Admin panel slow" → Defer (low traffic)
+* "Could use Redis" → Defer (no data proving need)
 
 ---
 
@@ -1822,4 +1969,6 @@ export async function generateStaticParams() {
 **Status:** 03-TECHNICAL-ARCHITECTURE.md COMPLETE ✅
 
 **Next Steps:**
-- Proceed to `06-IMPLEMENTATION-PLAN.md` for phase-by-phase task breakdown
+
+* Proceed to `04-USER-FLOWS.md` to ensure edge cases match this architecture
+* Proceed to `06-IMPLEMENTATION-PLAN.md` for phase-by-phase task breakdown
