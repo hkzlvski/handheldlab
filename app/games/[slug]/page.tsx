@@ -8,18 +8,13 @@ import ReportCard, {
 } from '@/components/features/ReportCard'
 import SortSelect from '@/components/features/SortSelect'
 
-type SearchParams = {
-  device?: string
-  sort?: 'helpful' | 'newest' | 'fps' | 'tdp'
-  page?: string
-}
-
-type Params = { slug: string }
+type SortKey = 'helpful' | 'newest' | 'fps' | 'tdp'
 
 type PageProps = {
-  // Next 15: params/searchParams can be Promises in Server Components
-  params: Params | Promise<Params>
-  searchParams?: SearchParams | Promise<SearchParams>
+  params: { slug: string } | Promise<{ slug: string }>
+  searchParams?:
+    | { device?: string; sort?: SortKey; page?: string }
+    | Promise<{ device?: string; sort?: SortKey; page?: string }>
 }
 
 const PAGE_SIZE = 12
@@ -59,6 +54,7 @@ type ReportRow = {
 }
 
 type PublicProfileRow = { id: string; username: string }
+type VoteRow = { report_id: string }
 
 function sortToOrder(sort?: string) {
   switch (sort) {
@@ -87,30 +83,24 @@ function buildQueryString(
   return s ? `?${s}` : ''
 }
 
-function isPromiseLike<T>(v: unknown): v is Promise<T> {
-  return !!v && typeof v === 'object' && 'then' in v
-}
+export default async function GamePage(props: PageProps) {
+  // ✅ Next 15: params/searchParams mogą być Promise → unwrap
+  const { params, searchParams } = props
+  const p = await Promise.resolve(params)
+  const sp = await Promise.resolve(searchParams ?? {})
 
-export default async function GamePage({ params, searchParams }: PageProps) {
+  const slug = p.slug
+  const deviceSlug = sp.device ?? ''
+  const sort: SortKey = sp.sort ?? 'helpful'
+  const page = Math.max(1, Number(sp.page ?? '1') || 1)
+
   const supabase = await createClient()
-
-  // ✅ Next 15 fix: unwrap params + searchParams if Promises
-  const p = isPromiseLike<Params>(params) ? await params : params
-  const sp = searchParams
-    ? isPromiseLike<SearchParams>(searchParams)
-      ? await searchParams
-      : searchParams
-    : undefined
-
-  const deviceSlug = sp?.device ?? ''
-  const sort = sp?.sort ?? 'helpful'
-  const page = Math.max(1, Number(sp?.page ?? '1') || 1)
 
   // 1) game
   const { data: gameRows, error: gameErr } = await supabase
     .from('games')
     .select('id,name,slug,steam_app_id')
-    .eq('slug', p.slug)
+    .eq('slug', slug)
     .eq('status', 'approved')
     .limit(1)
 
@@ -128,7 +118,7 @@ export default async function GamePage({ params, searchParams }: PageProps) {
   if (devicesErr) console.error('Devices fetch error:', devicesErr)
   const devices = (devicesData ?? []) as DeviceRow[]
 
-  // 3) device slug -> device id (jeśli nie istnieje, ignorujemy filtr)
+  // 3) device filter (jeśli slug nie pasuje → ignorujemy filtr)
   let deviceId: string | null = null
   if (deviceSlug) {
     const found = devices.find((d) => d.slug === deviceSlug)
@@ -176,7 +166,29 @@ export default async function GamePage({ params, searchParams }: PageProps) {
 
   const reportRows = (reportsData ?? []) as unknown as ReportRow[]
 
-  // 5) LEFT JOIN author -> public_profiles (anon-safe)
+  // ✅ B.3.3: vote state for logged user (so after F5 UI is correct)
+  const { data: authData, error: authErr } = await supabase.auth.getUser()
+  if (authErr) console.error('Auth getUser error:', authErr)
+  const userId = authData.user?.id ?? null
+
+  const votedSet = new Set<string>()
+  if (userId && reportRows.length > 0) {
+    const reportIds = reportRows.map((r) => r.id)
+
+    const { data: votesData, error: votesErr } = await supabase
+      .from('performance_votes')
+      .select('report_id')
+      .eq('user_id', userId)
+      .in('report_id', reportIds)
+
+    if (votesErr) console.error('Votes fetch error:', votesErr)
+
+    for (const v of (votesData ?? []) as VoteRow[]) {
+      if (v?.report_id) votedSet.add(v.report_id)
+    }
+  }
+
+  // 5) author map (anon-safe)
   const userIds = Array.from(
     new Set(reportRows.map((r) => r.user_id).filter(Boolean))
   ) as string[]
@@ -189,17 +201,16 @@ export default async function GamePage({ params, searchParams }: PageProps) {
       .in('id', userIds)
 
     if (profilesErr) console.error('Profiles fetch error:', profilesErr)
-
     for (const pr of (profilesData ?? []) as PublicProfileRow[]) {
       usernameById.set(pr.id, pr.username)
     }
   }
 
-  // 6) device id -> name
+  // 6) device name map
   const deviceNameById = new Map<string, string>()
   for (const d of devices) deviceNameById.set(d.id, d.name)
 
-  // 7) signed URLs
+  // 7) signed urls + cards
   const cards: ReportCardData[] = await Promise.all(
     reportRows.map(async (r) => {
       let screenshotUrl: string | null = null
@@ -224,6 +235,7 @@ export default async function GamePage({ params, searchParams }: PageProps) {
         deviceName: deviceNameById.get(r.device_id) ?? 'Unknown device',
         screenshotUrl,
         upvotes: r.upvotes ?? 0,
+        voted: votedSet.has(r.id), // ✅ critical for F5
         fps_average: r.fps_average,
         fps_min: r.fps_min,
         fps_max: r.fps_max,

@@ -634,67 +634,100 @@ handheldlab/
 
 **A.3 Complete:** Layout + core UI components ready
 
+## A.4 Storage Setup (4h)
+
+**Goal:** Secure, private storage for report screenshots using Supabase Storage with signed URL access.
+
 ---
 
-### A.4 Storage Setup (4h)
-
-#### A.4.1 Create Screenshots Bucket (0.5h)
+### A.4.1 Create proofs Bucket (0.5h)
 
 **Actions:**
 
-1. Open Supabase Storage
-2. Create bucket: `screenshots` (private)
-3. Configure policies from 03-TECHNICAL-ARCHITECTURE.md Section 5.2
+1. Open Supabase Dashboard → Storage
+2. Create bucket: **`proofs`**
+3. Set bucket visibility to **private**
+4. Configure policies from `03-TECHNICAL-ARCHITECTURE.md` Section 5.2
+
+> **LOCKED RULE:**  
+> All report screenshots are stored exclusively in the private `proofs` bucket and are accessed **only via signed URLs**.  
+> Screenshots are never public.
 
 **Testing:**
 
-* [ ] Bucket created
-* [ ] Policies enforce userId path prefix
-* [ ] Anonymous user cannot read files
+* [ ] Bucket `proofs` exists
+* [ ] Bucket is private
+* [ ] Storage policies enforce `userId/*` path prefix
+* [ ] Anonymous users cannot read files
+* [ ] Files are not publicly accessible via URL
 
 ---
 
-#### A.4.2 Upload Helper Function (1.5h)
+### A.4.2 Upload Helper Function (1.5h)
 
 **Actions:**
 
-1. Create `lib/storage/upload.ts` from 03-TECHNICAL-ARCHITECTURE.md Section 5.3
-2. Validate file type, size
-3. Generate unique path
-4. Upload to bucket
+1. Create `lib/storage/upload.ts` (reference: 03-TECHNICAL-ARCHITECTURE.md Section 5.3)
+2. Validate uploaded file:
+   * Allowed types: `image/jpeg`, `image/png`, `image/webp`
+   * Max size: **5MB**
+3. Generate unique, non-guessable storage path
+4. Upload file to `proofs` bucket
+5. Persist resulting storage path in database column:
+
+performance_reports.screenshot_storage_path
+
+mathematica
+Skopiuj kod
+
+**Path Format (LOCKED):**
+
+{userId}/{timestamp}-{random}.{ext}
+
+markdown
+Skopiuj kod
 
 **Testing:**
 
-* [ ] Valid file uploads successfully
-* [ ] Invalid file type rejected
-* [ ] File >5MB rejected
-* [ ] Path follows `userId/timestamp-random.ext`
+* [ ] Valid image uploads successfully
+* [ ] Invalid MIME type rejected
+* [ ] File larger than 5MB rejected
+* [ ] Path matches `userId/timestamp-random.ext`
+* [ ] Path stored correctly in `screenshot_storage_path`
+* [ ] Upload fails if user tries to spoof another user's path
 
 ---
 
-#### A.4.3 Signed URL Helper (1h)
+### A.4.3 Signed URL Helper (1h)
 
 **Actions:**
 
-1. Create `lib/storage/signed-urls.ts` from 03-TECHNICAL-ARCHITECTURE.md Section 5.5
-2. Implement in-memory cache (best-effort)
-3. Generate signed URLs with 1h expiry
+1. Create `lib/storage/signed-urls.ts` (reference: 03-TECHNICAL-ARCHITECTURE.md Section 5.5)
+2. Generate signed URLs for files stored in `proofs`
+3. Signed URL expiration: **1 hour**
+4. Implement best-effort in-memory cache to reduce duplicate Supabase calls
+
+**Notes:**
+
+* Signed URLs are generated server-side only
+* Client never receives raw storage paths
 
 **Testing:**
 
-* [ ] Signed URL generated
-* [ ] URL expires after 1h
-* [ ] Cache reduces duplicate calls
+* [ ] Signed URL generated for valid path
+* [ ] Signed URL expires after ~1 hour
+* [ ] Invalid or missing path fails safely
+* [ ] Repeated requests reuse cached signed URLs where possible
 
 ---
 
-#### A.4.4 Next.js Image Config (1h)
+### A.4.4 Next.js Image Configuration (1h)
 
 **Actions:**
 
-1. Add Supabase domain to `next.config.js`:
+1. Update `next.config.js` to allow Supabase signed URLs:
 
-```javascript
+```js
 images: {
   remotePatterns: [
     {
@@ -704,21 +737,24 @@ images: {
     },
   ],
 }
-```
+Render screenshots using next/image
 
-2. Test Image component with signed URLs
+Use unoptimized fallback if required (signed URLs)
 
-**Testing:**
+Testing:
 
-* [ ] Next.js Image works with signed URLs
-* [ ] Images lazy load
-* [ ] Fallback to `unoptimized` if needed
+ <Image /> renders signed URLs correctly
 
----
+ Images lazy-load correctly
 
-**A.4 Complete:** Storage system ready for submit flow
+ No broken images after refresh
 
----
+ Images do not require public bucket access
+
+A.4 Complete ✅
+
+Deliverable:
+Private, secure screenshot storage using the proofs bucket with validated uploads, signed URL access, and full integration with submit and game pages.
 
 ### A.5 Error Handling & Validation (3h)
 
@@ -1812,7 +1848,7 @@ export const metadata = {
 
 **Storage:**
 
-* [ ] `screenshots` bucket created (private)
+* [ ] `proofs` bucket created (private)
 * [ ] Storage policies configured
 
 **Auth:**

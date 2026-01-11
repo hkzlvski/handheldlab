@@ -1,9 +1,9 @@
-// components/features/ReportCard.tsx
 'use client'
 
 import { useMemo, useState } from 'react'
 import Image from 'next/image'
 import ScreenshotModal from '@/components/features/ScreenshotModal'
+import UpvoteButton from '@/components/features/UpvoteButton'
 
 export type ReportCardData = {
   id: string
@@ -12,6 +12,7 @@ export type ReportCardData = {
   deviceName: string
   screenshotUrl: string | null
   upvotes: number
+  voted?: boolean
   fps_average: number
   fps_min: number | null
   fps_max: number | null
@@ -22,11 +23,20 @@ export type ReportCardData = {
   additional_notes: string | null
 }
 
+function toSafeInt(n: unknown, fallback = 0) {
+  const x = Number(n)
+  if (!Number.isFinite(x)) return fallback
+  return Math.max(0, Math.trunc(x))
+}
+
 export default function ReportCard({ report }: { report: ReportCardData }) {
   const [open, setOpen] = useState(false)
 
+  // ✅ single source of truth
+  const [upvotes, setUpvotes] = useState(() => toSafeInt(report.upvotes, 0))
+  const [voted, setVoted] = useState(() => !!report.voted)
+
   const fpsLabel = useMemo(() => {
-    // proste badge; kolory poprawimy w dark theme później
     if (report.fps_average >= 60) return 'Excellent'
     if (report.fps_average >= 40) return 'Good'
     if (report.fps_average >= 30) return 'Playable'
@@ -59,7 +69,6 @@ export default function ReportCard({ report }: { report: ReportCardData }) {
             )}
           </div>
 
-          {/* FPS badge */}
           <div className="absolute left-3 top-3 rounded-md bg-white/90 px-2 py-1 text-xs font-semibold text-gray-900">
             {report.fps_average} FPS • {fpsLabel}
           </div>
@@ -80,7 +89,7 @@ export default function ReportCard({ report }: { report: ReportCardData }) {
             <div className="text-right">
               <div className="text-xs text-gray-500">Upvotes</div>
               <div className="text-sm font-semibold text-gray-900">
-                {report.upvotes}
+                {upvotes}
               </div>
             </div>
           </div>
@@ -118,15 +127,15 @@ export default function ReportCard({ report }: { report: ReportCardData }) {
 
           {/* Actions */}
           <div className="mt-4 flex items-center justify-between">
-            {/* Upvote button placeholder (B.3) */}
-            <button
-              type="button"
-              className="rounded-md border border-gray-200 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50"
-              disabled
-              title="Upvoting comes next (B.3)"
-            >
-              Upvote (soon)
-            </button>
+            <UpvoteButton
+              reportId={report.id}
+              count={upvotes}
+              voted={voted}
+              onChange={(next) => {
+                setUpvotes(toSafeInt(next.count, 0))
+                setVoted(!!next.voted)
+              }}
+            />
 
             <button
               type="button"
