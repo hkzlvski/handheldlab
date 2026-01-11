@@ -132,8 +132,8 @@ export default function ReportCard({ report }: { report: ReportCardData }) {
               count={upvotes}
               voted={voted}
               onChange={(next) => {
-                setUpvotes(toSafeInt(next.count, 0))
-                setVoted(!!next.voted)
+                setUpvotes(next.count)
+                setVoted(next.voted)
               }}
             />
 

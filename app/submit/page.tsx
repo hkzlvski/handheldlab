@@ -264,7 +264,11 @@ export default function SubmitPage() {
 
             <button
               type="button"
-              className="text-sm font-medium text-blue-600 hover:text-blue-700"
+              disabled={isSubmitting}
+              className={[
+                'text-sm font-medium text-blue-600 hover:text-blue-700',
+                isSubmitting ? 'cursor-not-allowed opacity-70' : '',
+              ].join(' ')}
               onClick={() => setIsAddGameOpen(true)}
             >
               Can&apos;t find game?
@@ -496,7 +500,7 @@ export default function SubmitPage() {
             disabled={!isValid || isSubmitting}
             loading={isSubmitting}
           >
-            Submit report
+            {isSubmitting ? 'Submitting…' : 'Submit report'}
           </Button>
         </div>
       </form>

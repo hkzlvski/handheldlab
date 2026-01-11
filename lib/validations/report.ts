@@ -9,6 +9,7 @@ export const resolutionEnum = z.enum([
   '720p',
   '540p',
 ])
+
 export const graphicsPresetEnum = z.enum([
   'low',
   'medium',
@@ -21,12 +22,37 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024
 const ALLOWED_MIME = ['image/png', 'image/jpeg', 'image/webp'] as const
 type AllowedMime = (typeof ALLOWED_MIME)[number]
 
-const optionalNumber = z
-  .union([z.coerce.number(), z.literal(''), z.undefined(), z.null()])
-  .transform((val) =>
-    val === '' || val === null || val === undefined ? undefined : val
+// ✅ Optional number that:
+// - treats "" / null / undefined as undefined (so "optional" REALLY works)
+// - treats invalid non-empty input as NaN -> Zod will throw (good UX)
+function optionalIntInRange(min: number, max: number, label: string) {
+  return z.preprocess(
+    (v) => {
+      if (v === null || v === undefined) return undefined
+
+      if (typeof v === 'string') {
+        const t = v.trim()
+        if (t === '') return undefined
+        const n = Number(t)
+        return Number.isFinite(n) ? n : NaN
+      }
+
+      if (typeof v === 'number') {
+        // ✅ RHF valueAsNumber daje NaN dla pustego pola
+        if (!Number.isFinite(v)) return undefined
+        return v
+      }
+
+      return NaN
+    },
+    z
+      .number()
+      .int(`${label} must be an integer`)
+      .min(min, `${label} must be ${min}-${max}`)
+      .max(max, `${label} must be ${min}-${max}`)
+      .optional()
   )
-  .refine((v) => v === undefined || Number.isFinite(v), 'Must be a number')
+}
 
 export const reportBaseSchema = z
   .object({
@@ -35,27 +61,17 @@ export const reportBaseSchema = z
 
     fps_average: z.coerce
       .number()
-      .int()
+      .int('FPS average must be an integer')
       .min(1, 'FPS average must be >= 1')
       .max(999, 'FPS average must be <= 999'),
 
-    fps_min: optionalNumber
-      .refine(
-        (v) => v === undefined || (v >= 1 && v <= 999),
-        'FPS min must be 1-999'
-      )
-      .optional(),
-
-    fps_max: optionalNumber
-      .refine(
-        (v) => v === undefined || (v >= 1 && v <= 999),
-        'FPS max must be 1-999'
-      )
-      .optional(),
+    // ✅ truly optional now
+    fps_min: optionalIntInRange(1, 999, 'FPS min'),
+    fps_max: optionalIntInRange(1, 999, 'FPS max'),
 
     tdp_watts: z.coerce
       .number()
-      .int()
+      .int('TDP must be an integer')
       .min(5, 'TDP must be >= 5')
       .max(30, 'TDP must be <= 30'),
 
@@ -98,6 +114,7 @@ export const reportBaseSchema = z
         message: 'FPS min cannot be greater than FPS max',
       })
     }
+
     if (data.fps_min !== undefined && data.fps_min > data.fps_average) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -105,6 +122,7 @@ export const reportBaseSchema = z
         message: 'FPS min cannot be greater than FPS average',
       })
     }
+
     if (data.fps_max !== undefined && data.fps_max < data.fps_average) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,

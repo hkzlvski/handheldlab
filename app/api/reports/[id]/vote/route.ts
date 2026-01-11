@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/server'
 
+export const runtime = 'nodejs'
+
 function badRequest(message: string, requestId?: string) {
   return NextResponse.json(
     { ok: false, error: 'bad_request', message, requestId },
@@ -14,6 +16,13 @@ function unauthorized(message = 'Unauthorized', requestId?: string) {
   return NextResponse.json(
     { ok: false, error: 'unauthorized', message, requestId },
     { status: 401 }
+  )
+}
+
+function forbidden(message = 'Forbidden', requestId?: string) {
+  return NextResponse.json(
+    { ok: false, error: 'forbidden', message, requestId },
+    { status: 403 }
   )
 }
 
@@ -35,20 +44,54 @@ function createAdminClient() {
   })
 }
 
+function assertSameOrigin(req: Request) {
+  // Basic CSRF guard: allow only same-origin browser requests.
+  // If you do SSR / server-to-server calls later, you can relax this.
+  const origin = req.headers.get('origin')
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL
+
+  if (!origin) return false
+  if (!appUrl) return true // if not configured, don't hard-fail in dev
+
+  try {
+    const o = new URL(origin)
+    const a = new URL(appUrl)
+    return o.origin === a.origin
+  } catch {
+    return false
+  }
+}
+
+async function ensureReportIsVotable(reportId: string) {
+  const admin = createAdminClient()
+  const { data, error } = await admin
+    .from('performance_reports')
+    .select('id,verification_status')
+    .eq('id', reportId)
+    .limit(1)
+
+  if (error) throw error
+  const row = data?.[0]
+  if (!row) return { exists: false, votable: false }
+  // tighten rule if you want: only verified reports are votable
+  const votable = row.verification_status === 'verified'
+  return { exists: true, votable }
+}
+
 async function recalcAndPersistUpvotes(reportId: string) {
   const admin = createAdminClient()
 
-  // count votes for report
+  // count votes for report (head: true => no rows returned)
   const { count, error: countErr } = await admin
     .from('performance_votes')
-    .select('*', { count: 'exact', head: true })
+    .select('id', { count: 'exact', head: true })
     .eq('report_id', reportId)
 
   if (countErr) throw countErr
 
   const upvotes = Math.max(0, Number(count ?? 0))
 
-  // persist to reports table (optional but recommended)
+  // persist to reports table
   const { error: updErr } = await admin
     .from('performance_reports')
     .update({ upvotes })
@@ -65,8 +108,15 @@ export async function POST(
 ) {
   const requestId = crypto.randomUUID()
   try {
+    if (!assertSameOrigin(req)) return forbidden('Invalid origin', requestId)
+
     const { id: reportId } = await ctx.params
     if (!reportId) return badRequest('Missing report id', requestId)
+
+    // Optional but recommended: block voting on non-verified reports
+    const { exists, votable } = await ensureReportIsVotable(reportId)
+    if (!exists) return badRequest('Report not found', requestId)
+    if (!votable) return forbidden('Report is not votable', requestId)
 
     const supabase = await createClient()
 
@@ -86,9 +136,7 @@ export async function POST(
     if (upsertErr)
       return serverError('Vote failed. Please try again.', requestId)
 
-    // ✅ authoritative count
     const upvotes = await recalcAndPersistUpvotes(reportId)
-
     return NextResponse.json({ ok: true, upvotes, voted: true, requestId })
   } catch (e) {
     console.error(e)
@@ -102,8 +150,14 @@ export async function DELETE(
 ) {
   const requestId = crypto.randomUUID()
   try {
+    if (!assertSameOrigin(req)) return forbidden('Invalid origin', requestId)
+
     const { id: reportId } = await ctx.params
     if (!reportId) return badRequest('Missing report id', requestId)
+
+    const { exists, votable } = await ensureReportIsVotable(reportId)
+    if (!exists) return badRequest('Report not found', requestId)
+    if (!votable) return forbidden('Report is not votable', requestId)
 
     const supabase = await createClient()
 
@@ -121,7 +175,6 @@ export async function DELETE(
     if (delErr) return serverError('Vote failed. Please try again.', requestId)
 
     const upvotes = await recalcAndPersistUpvotes(reportId)
-
     return NextResponse.json({ ok: true, upvotes, voted: false, requestId })
   } catch (e) {
     console.error(e)
