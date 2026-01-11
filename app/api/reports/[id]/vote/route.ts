@@ -45,18 +45,37 @@ function createAdminClient() {
 }
 
 function assertSameOrigin(req: Request) {
-  // Basic CSRF guard: allow only same-origin browser requests.
-  // If you do SSR / server-to-server calls later, you can relax this.
   const origin = req.headers.get('origin')
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL
-
   if (!origin) return false
-  if (!appUrl) return true // if not configured, don't hard-fail in dev
+
+  // 1) origin wyliczony z requestu (działa w dev i prod, nawet za proxy)
+  const proto =
+    req.headers.get('x-forwarded-proto') ||
+    (origin.startsWith('https://') ? 'https' : 'http')
+
+  const host =
+    req.headers.get('x-forwarded-host') || req.headers.get('host') || ''
+
+  const requestOrigin = host ? `${proto}://${host}` : null
+
+  // 2) origin z env (jeśli ustawione)
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, '') || null
+  const envOrigin = appUrl ? new URL(appUrl).origin : null
+
+  // 3) allowlista
+  const allowed = new Set<string>()
+  if (requestOrigin) allowed.add(requestOrigin)
+  if (envOrigin) allowed.add(envOrigin)
+
+  // 4) w dev dopuszczamy lokalne hosty (bo env często wskazuje na prod)
+  if (process.env.NODE_ENV !== 'production') {
+    allowed.add('http://localhost:3000')
+    allowed.add('http://127.0.0.1:3000')
+  }
 
   try {
-    const o = new URL(origin)
-    const a = new URL(appUrl)
-    return o.origin === a.origin
+    const o = new URL(origin).origin
+    return allowed.has(o)
   } catch {
     return false
   }

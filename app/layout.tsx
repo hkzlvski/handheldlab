@@ -8,9 +8,51 @@ import Footer from '@/components/layout/Footer'
 
 const inter = Inter({ subsets: ['latin'] })
 
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, '') ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '') ||
+  'http://localhost:3000'
+
 export const metadata: Metadata = {
-  title: 'HandheldLab',
+  metadataBase: new URL(APP_URL),
+
+  title: {
+    default: 'HandheldLab',
+    template: '%s • HandheldLab',
+  },
+
   description: 'Performance database for handheld gaming PCs',
+
+  alternates: {
+    canonical: '/',
+  },
+
+  icons: {
+    icon: '/favicon.ico',
+    // opcjonalnie jak dodasz: public/icon.png
+    // apple: '/apple-touch-icon.png',
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+  },
+
+  openGraph: {
+    type: 'website',
+    url: APP_URL,
+    siteName: 'HandheldLab',
+    title: 'HandheldLab',
+    description: 'Performance database for handheld gaming PCs',
+    // images: [{ url: '/og.png', width: 1200, height: 630, alt: 'HandheldLab' }],
+  },
+
+  twitter: {
+    card: 'summary_large_image',
+    title: 'HandheldLab',
+    description: 'Performance database for handheld gaming PCs',
+    // images: ['/og.png'],
+  },
 }
 
 export default function RootLayout({

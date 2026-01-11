@@ -1,8 +1,32 @@
 // app/page.tsx
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 
 type Game = { id: string; name: string; slug: string }
+
+export const metadata: Metadata = {
+  // NOTE: layout has template "%s • HandheldLab" → tutaj bez "HandheldLab"
+  title: 'Handheld performance database',
+  description:
+    'Browse real-world performance reports for handheld gaming PCs. Verified FPS, settings, battery usage, and proof screenshots.',
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    type: 'website',
+    title: 'Handheld performance database',
+    description:
+      'Find the best settings for games on Steam Deck, ROG Ally, Legion Go and other handheld gaming PCs.',
+    url: '/',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Handheld performance database',
+    description:
+      'Find the best settings for games on Steam Deck, ROG Ally, Legion Go and other handheld gaming PCs.',
+  },
+}
 
 export default async function HomePage() {
   const supabase = await createClient()

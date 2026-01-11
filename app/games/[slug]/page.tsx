@@ -1,6 +1,8 @@
 // app/games/[slug]/page.tsx
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { cache } from 'react'
 
 import { createClient } from '@/lib/supabase/server'
 import ReportCard, {
@@ -83,6 +85,67 @@ function buildQueryString(
   return s ? `?${s}` : ''
 }
 
+/**
+ * ✅ shared fetch (dedup) for page + metadata
+ */
+const getApprovedGameBySlug = cache(async (slug: string) => {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('games')
+    .select('id,name,slug,steam_app_id')
+    .eq('slug', slug)
+    .eq('status', 'approved')
+    .limit(1)
+
+  if (error) console.error('getApprovedGameBySlug error:', error)
+  return (data?.[0] ?? null) as GameRow | null
+})
+
+/**
+ * SEO: dynamic metadata per game slug (C.2.1)
+ */
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string } | Promise<{ slug: string }>
+}): Promise<Metadata> {
+  const p = await Promise.resolve(params)
+  const slug = p.slug
+
+  const game = await getApprovedGameBySlug(slug)
+
+  if (!game) {
+    return {
+      title: 'Game not found',
+      description: 'This game is not available.',
+      robots: { index: false, follow: false },
+    }
+  }
+
+  // NOTE: layout has template "%s • HandheldLab" → tutaj NIE dodajemy "HandheldLab"
+  const title = `${game.name} performance reports`
+  const description = `Real handheld performance reports for ${game.name}: verified FPS, settings, TDP, and proof screenshots.`
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `/games/${game.slug}`,
+    },
+    openGraph: {
+      title,
+      description,
+      url: `/games/${game.slug}`,
+      type: 'article',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
+  }
+}
+
 export default async function GamePage(props: PageProps) {
   // ✅ Next 15: params/searchParams mogą być Promise → unwrap
   const { params, searchParams } = props
@@ -96,16 +159,8 @@ export default async function GamePage(props: PageProps) {
 
   const supabase = await createClient()
 
-  // 1) game
-  const { data: gameRows, error: gameErr } = await supabase
-    .from('games')
-    .select('id,name,slug,steam_app_id')
-    .eq('slug', slug)
-    .eq('status', 'approved')
-    .limit(1)
-
-  if (gameErr) console.error('Game fetch error:', gameErr)
-  const game = (gameRows?.[0] ?? null) as GameRow | null
+  // 1) game (deduped with metadata)
+  const game = await getApprovedGameBySlug(slug)
   if (!game) notFound()
 
   // 2) devices
@@ -124,6 +179,19 @@ export default async function GamePage(props: PageProps) {
     const found = devices.find((d) => d.slug === deviceSlug)
     deviceId = found ? found.id : null
   }
+
+  // 3.5) total count (real, pod pagination + "X reports")
+  let countQuery = supabase
+    .from('performance_reports')
+    .select('id', { count: 'exact', head: true })
+    .eq('game_id', game.id)
+    .eq('verification_status', 'verified')
+
+  if (deviceId) countQuery = countQuery.eq('device_id', deviceId)
+
+  const { count: totalCount, error: countErr } = await countQuery
+  if (countErr) console.error('Reports count error:', countErr)
+  const total = totalCount ?? 0
 
   // 4) reports + pagination
   const { column, ascending } = sortToOrder(sort)
@@ -235,7 +303,7 @@ export default async function GamePage(props: PageProps) {
         deviceName: deviceNameById.get(r.device_id) ?? 'Unknown device',
         screenshotUrl,
         upvotes: r.upvotes ?? 0,
-        voted: votedSet.has(r.id), // ✅ critical for F5
+        voted: votedSet.has(r.id),
         fps_average: r.fps_average,
         fps_min: r.fps_min,
         fps_max: r.fps_max,
@@ -253,7 +321,7 @@ export default async function GamePage(props: PageProps) {
       ? `https://store.steampowered.com/app/${game.steam_app_id}`
       : null
 
-  const totalThisPage = cards.length
+  const hasMore = page * PAGE_SIZE < total
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-10">
@@ -276,9 +344,10 @@ export default async function GamePage(props: PageProps) {
           </div>
         </div>
 
-        {totalThisPage >= 10 && (
-          <p className="text-sm text-gray-600">{totalThisPage} reports</p>
-        )}
+        <p className="text-sm text-gray-600">
+          {total} report{total === 1 ? '' : 's'}
+          {deviceSlug ? ' (filtered)' : ''}
+        </p>
       </div>
 
       {/* Controls */}
@@ -360,7 +429,7 @@ export default async function GamePage(props: PageProps) {
                 </Link>
               )}
 
-              {cards.length === PAGE_SIZE && (
+              {hasMore && (
                 <Link
                   className="rounded-md border border-gray-200 bg-white px-4 py-2 text-sm hover:bg-gray-50"
                   href={buildQueryString(

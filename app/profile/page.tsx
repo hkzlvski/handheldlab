@@ -1,8 +1,30 @@
 // app/profile/page.tsx
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
 import { createClient } from '@/lib/supabase/server'
+
+export const metadata: Metadata = {
+  title: 'Profile',
+  description: 'Your HandheldLab profile and submitted performance reports.',
+  alternates: { canonical: '/profile' },
+  robots: {
+    index: false, // ✅ profile to prywatna strona usera
+    follow: false,
+  },
+  openGraph: {
+    title: 'Profile',
+    description: 'Your HandheldLab profile and submitted performance reports.',
+    url: '/profile',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Profile',
+    description: 'Your HandheldLab profile and submitted performance reports.',
+  },
+}
 
 type ProfileRow = {
   id: string
